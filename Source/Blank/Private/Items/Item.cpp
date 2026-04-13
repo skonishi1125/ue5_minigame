@@ -1,10 +1,16 @@
 ﻿#include "Items/Item.h"
 
+float AItem::TransformedSin()
+{
+	return Amplitude * FMath::Sin(RunningTime * TimeConstant);
+
+}
+
 AItem::AItem()
 {
 	// Tick()の有効化
 	PrimaryActorTick.bCanEverTick = true;
-	AttachMeshComponent();
+	SetupComponents();
 }
 
 void AItem::BeginPlay()
@@ -16,10 +22,14 @@ void AItem::BeginPlay()
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	RunningTime += DeltaTime;
+
+	// 上下ホバリング
+	AddActorWorldOffset(FVector(0, 0, TransformedSin()));
 }
 
 // Root に Scene(空コンポーネント)を付与して、子要素にMeshを付与する
-void AItem::AttachMeshComponent()
+void AItem::SetupComponents()
 {
 	RootScene = CreateDefaultSubobject<USceneComponent>(TEXT("RootScene"));
 	SetRootComponent(RootScene);
