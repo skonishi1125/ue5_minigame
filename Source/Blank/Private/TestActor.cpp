@@ -17,7 +17,7 @@ void ATestActor::BeginPlay()
 	Super::BeginPlay();
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, "TestActor!");
+		GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, "Git Installed.");
 	}
 
 }
