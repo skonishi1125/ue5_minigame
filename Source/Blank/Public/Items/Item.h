@@ -21,13 +21,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ItemMesh;
 
-	// 回転処理
+	// 浮遊処理
 	UFUNCTION(BlueprintPure)
 	float TransformedSin();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
-	float Amplitude = .25f; // 振幅
+	float Amplitude = .1f; // 振幅
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
-	float TimeConstant = 5.f; // RunningTimeにかける値 2π / k における、K
+	float TimeConstant = 2.f; // 波長 値が大きくなるほど往復スピードが上がる。(波長 = 2π / k における、k)
+
+	// 回転処理
+	void RotateObject(float DeltaTime);
+	float RotationSpeed = 45.0f; // [deg/s]: 秒間あたり何度回るか
 
 private:
 	void SetupComponents();
