@@ -1,9 +1,18 @@
 ﻿#include "Pawns/Bird.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ABird::ABird()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	Capsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
+	Capsule->SetCapsuleHalfHeight(20.f);
+	Capsule->SetCapsuleRadius(15.f);
+	SetRootComponent(Capsule);
+
+	BirdMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	BirdMesh->SetupAttachment(GetRootComponent()); // = Capsule の子にする
 
 }
 
