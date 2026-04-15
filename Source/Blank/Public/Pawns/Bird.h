@@ -7,6 +7,7 @@
 #include "Bird.generated.h"
 
 class UCapsuleComponent;
+class USkeletalMeshComponent;
 
 UCLASS()
 class BLANK_API ABird : public APawn

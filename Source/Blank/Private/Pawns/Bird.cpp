@@ -1,5 +1,6 @@
 ﻿#include "Pawns/Bird.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 ABird::ABird()
