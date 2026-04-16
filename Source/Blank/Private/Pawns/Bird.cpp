@@ -24,12 +24,17 @@ ABird::ABird()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmBird"));
 	SpringArm->SetupAttachment(GetRootComponent());
 	SpringArm->TargetArmLength = 200.f;
+	SpringArm->bUsePawnControlRotation = true; // Controler の回転を SpringArmに反映させる
+
 	//SpringArm->AddLocalRotation(FRotator(-20.f, 0.f, 0.f));
 	SpringArm->SetRelativeRotation(FRotator(-20.f, 0.f, 0.f));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+	// Controller の Yaw(左右回転)に、Bird 自身も追従させる
+	bUseControllerRotationYaw = true;
 
 }
 
@@ -71,6 +76,12 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			// ETriggerEvent::Triggered は入力が続いている間、毎フレーム呼ばれる処理
 			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABird::Move);
 		}
+
+		if (LookAction)
+		{
+			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABird::Look);
+		}
+
 	}
 
 }
@@ -91,4 +102,18 @@ void ABird::Move(const FInputActionValue& Value)
 		AddActorLocalOffset(RightDirection * MovementVector.X * MoveSpeed, true);
 	}
 }
+
+void ABird::Look(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// ControllerのYaw(Z軸/左右)とPitch(Y軸/上下)にマウスの移動量を足す
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
+
+}
+
 
