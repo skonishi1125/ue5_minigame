@@ -95,11 +95,11 @@ void ABird::Move(const FInputActionValue& Value)
 		const FVector ForwardDirection = GetActorForwardVector();
 		const FVector RightDirection = GetActorRightVector();
 
-		// 移動速度の倍率（必要に応じて調整）
+		// 移動速度倍率 一旦 10
 		float MoveSpeed = 10.0f;
 
-		AddActorLocalOffset(ForwardDirection * MovementVector.Y * MoveSpeed, true);
-		AddActorLocalOffset(RightDirection * MovementVector.X * MoveSpeed, true);
+		AddActorWorldOffset(ForwardDirection * MovementVector.Y * MoveSpeed, true);
+		AddActorWorldOffset(RightDirection * MovementVector.X * MoveSpeed, true);
 	}
 }
 
