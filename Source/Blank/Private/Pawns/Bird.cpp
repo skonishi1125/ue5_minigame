@@ -3,6 +3,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 ABird::ABird()
@@ -16,6 +18,18 @@ ABird::ABird()
 
 	BirdMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	BirdMesh->SetupAttachment(GetRootComponent()); // = Capsule の子にする
+	BirdMesh->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+
+	// カメラ系コンポーネント
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmBird"));
+	SpringArm->SetupAttachment(GetRootComponent());
+	SpringArm->TargetArmLength = 200.f;
+	//SpringArm->AddLocalRotation(FRotator(-20.f, 0.f, 0.f));
+	SpringArm->SetRelativeRotation(FRotator(-20.f, 0.f, 0.f));
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm);
+
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 }
 
