@@ -3,11 +3,16 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
 
 ABlankCharacter::ABlankCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	// 進行方向に振り向く設定にするかどうかと、振り向き速度
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
 
 	// Controller の回転に Character 自身は依存しないことを明示する
 	bUseControllerRotationYaw = false;
@@ -98,12 +103,17 @@ void ABlankCharacter::Move(const FInputActionValue& Value)
 		const FVector ForwardDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); // UEでいう正面
 		const FVector RightDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); // UEでいう真右
 
-		// Actor の向いている方向に進めたい場合はこちらを使う
+		// ACharacter の持つ移動用関数
+		AddMovementInput(ForwardDir, MoveVector.Y);
+		AddMovementInput(RightDir, MoveVector.X);
+
+		// こちらでも動くが、bOrientRotationToMovement など、移動方向に応じて振り向く処理などが適用されない
+		//AddActorWorldOffset(ForwardDir * MoveVector.Y * MoveSpeed, true);
+		//AddActorWorldOffset(RightDir * MoveVector.X * MoveSpeed, true);
+
+		// 単純に Actor の向いている方向に進めたい場合はこちら
 		//const FVector ForwardDir = GetActorForwardVector();
 		//const FVector RightDir = GetActorRightVector();
-
-		AddActorWorldOffset(ForwardDir * MoveVector.Y * MoveSpeed, true);
-		AddActorWorldOffset(RightDir * MoveVector.X * MoveSpeed, true);
 	}
 
 }
