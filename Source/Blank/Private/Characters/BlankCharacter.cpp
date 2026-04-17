@@ -1,4 +1,6 @@
 ﻿#include "Characters/BlankCharacter.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -6,9 +8,22 @@ ABlankCharacter::ABlankCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	//SpringArm->bUsePawnControlRotation = true; // Controler の回転を SpringArmに反映させる
+	// Controller の回転に Character 自身は依存しないことを明示する
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
 
-	bUseControllerRotationYaw = true;
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmBlankCharacter"));
+	SpringArm->SetupAttachment(GetRootComponent());
+	SpringArm->TargetArmLength = 200.f;
+	SpringArm->bUsePawnControlRotation = true; // Controler の回転を SpringArmに反映させる
+	SpringArm->SetRelativeRotation(FRotator(-20.f, 0.f, 0.f));
+
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm);
+
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
+
 
 
 }
@@ -65,14 +80,20 @@ void ABlankCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		const FVector ForwardDir = GetActorForwardVector();
-		const FVector RightDir = GetActorRightVector();
 
-		float MoveSpeed = 10.f;
+		const FRotator ControlRotation = GetControlRotation();
+		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+
+		// 回転行列
+		const FVector ForwardDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); // UEでいう正面
+		const FVector RightDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); // UEでいう真右
+
+		// Actor の向いている方向に進めたい場合はこちらを使う
+		//const FVector ForwardDir = GetActorForwardVector();
+		//const FVector RightDir = GetActorRightVector();
 
 		AddActorWorldOffset(ForwardDir * MoveVector.Y * MoveSpeed, true);
 		AddActorWorldOffset(RightDir * MoveVector.X * MoveSpeed, true);
-
 	}
 
 }
