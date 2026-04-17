@@ -13,6 +13,9 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 
+// Groom 関連
+class UGroomComponent;
+
 UCLASS()
 class BLANK_API ABlankCharacter : public ACharacter
 {
@@ -48,7 +51,10 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
 
-
+	UPROPERTY(VisibleAnywhere, Category = Hair)
+	UGroomComponent* Hair;
+	UPROPERTY(VisibleAnywhere, Category = Hair)
+	UGroomComponent* Eyebrows;
 
 
 };

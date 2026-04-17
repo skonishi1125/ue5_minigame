@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GroomComponent.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -22,7 +23,16 @@ ABlankCharacter::ABlankCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
+	// Auto Possess Player の設定。 不要かも
+	//AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+	// Grooms 関連
+	Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("Hair"));
+	Hair->SetupAttachment(GetMesh()); // APlayer がデフォルトで持つ CharacterMesh の子に指定
+	Hair->AttachmentName = FString("head"); // Socket を使ってくっつける
+	Eyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("Eyebrows"));
+	Eyebrows->SetupAttachment(GetMesh());
+	Eyebrows->AttachmentName = FString("head");
 
 
 
