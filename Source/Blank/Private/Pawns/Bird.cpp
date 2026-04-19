@@ -34,6 +34,7 @@ ABird::ABird()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 	// Controller の Yaw(左右回転)に、Bird 自身も追従させる
+	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = true;
 
 }
