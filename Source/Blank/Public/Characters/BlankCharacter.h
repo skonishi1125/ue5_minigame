@@ -47,7 +47,7 @@ protected:
 	// ========= アクション関連 ===========
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void Possess();
+	void PossessPlayerController();
 private:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;

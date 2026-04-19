@@ -5,6 +5,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Pawns/Bird.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -93,7 +95,7 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 		if (InteractAction)
 		{
-			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABlankCharacter::Possess);
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABlankCharacter::PossessPlayerController);
 		}
 
 	}
@@ -143,7 +145,50 @@ void ABlankCharacter::Look(const FInputActionValue& Value)
 
 }
 
-void ABlankCharacter::Possess()
+void ABlankCharacter::PossessPlayerController()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Possess Pressed!"));
+
+	// 始点と終点を決定して、Rayの長さを定義する
+	FVector Start = Camera->GetComponentLocation();
+	FVector End = Start + (Camera->GetForwardVector() * 1000.f);
+
+	// Line Trace準備
+	FHitResult HitResult; // 当たった対象、座標、表面角度などを格納するための構造体
+	FCollisionQueryParams CollisionParams; // Trace の挙動を設定するための構造体
+	CollisionParams.AddIgnoredActor(this); // BlankCharacter自身は干渉しないようにする
+
+	// GetWorld()->LineTraceSingleByChannel() で Rayを呼び出す
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		HitResult, // 当たったとき、格納するもの
+		Start,
+		End,
+		ECC_Visibility, // チャンネル
+		CollisionParams // Trace 挙動の調整用データ
+	);
+
+	// デバッグ用にRayを可視化する
+	DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Green : FColor::Red, false, 2.f, 0, 2.f);
+
+	if (bHit)
+	{
+		// 当たった Actor が ABird かどうかを Cast して確認
+		AActor* HitActor = HitResult.GetActor();
+
+		if (ABird* HitBird = Cast<ABird>(HitActor))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Bird Found!"));
+
+			// 現在の PlayerController を取得し、鳥へ Possess（憑依）する
+			if (APlayerController* PC = Cast<APlayerController>(GetController()))
+			{
+				PC->Possess(HitBird);
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Bird"));
+	}
+
 }

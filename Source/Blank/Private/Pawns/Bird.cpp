@@ -12,8 +12,9 @@ ABird::ABird()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Capsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
-	Capsule->SetCapsuleHalfHeight(20.f);
-	Capsule->SetCapsuleRadius(15.f);
+	Capsule->SetCapsuleHalfHeight(40.f);
+	Capsule->SetCapsuleRadius(40.f);
+	Capsule->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block); // Ray をキャッチできるようにする
 	SetRootComponent(Capsule);
 
 	BirdMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
@@ -31,8 +32,6 @@ ABird::ABird()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
-
 	// Controller の Yaw(左右回転)に、Bird 自身も追従させる
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = true;
@@ -42,6 +41,16 @@ ABird::ABird()
 void ABird::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ABird::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// Mapping Context の登録
 	// GetController()でPawnで使われているコントローラを持ってくる
@@ -57,18 +66,6 @@ void ABird::BeginPlay()
 			}
 		}
 	}
-
-}
-
-void ABird::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{

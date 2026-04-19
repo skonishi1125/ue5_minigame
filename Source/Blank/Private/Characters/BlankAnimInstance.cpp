@@ -1,8 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Characters/BlankAnimInstance.h"
 #include "Characters/BlankCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Characters/BlankAnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 
 void UBlankAnimInstance::NativeInitializeAnimation()
