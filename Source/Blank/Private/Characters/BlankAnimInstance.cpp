@@ -24,8 +24,13 @@ void UBlankAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	if (BlankCharacterMovement)
 	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(BlankCharacterMovement->Velocity);
+		IsFalling = BlankCharacterMovement->IsFalling();
+
 		if (GroundSpeed != 0)
+		{
 			UE_LOG(LogTemp, Log, TEXT("The vector value is: %s"), *BlankCharacterMovement->Velocity.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("The boolean value is %s"), (IsFalling ? TEXT("true") : TEXT("false")));
+		}
 	}
 
 }
