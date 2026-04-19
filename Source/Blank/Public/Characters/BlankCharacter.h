@@ -41,9 +41,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* JumpAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* InteractAction;
+
 	// ========= アクション関連 ===========
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Possess();
 private:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;

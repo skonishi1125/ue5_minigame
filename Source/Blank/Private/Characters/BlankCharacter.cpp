@@ -91,6 +91,11 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		}
 
+		if (InteractAction)
+		{
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABlankCharacter::Possess);
+		}
+
 	}
 
 }
@@ -136,4 +141,9 @@ void ABlankCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 
+}
+
+void ABlankCharacter::Possess()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Possess Pressed!"));
 }
