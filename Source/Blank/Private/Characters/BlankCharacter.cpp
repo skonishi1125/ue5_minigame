@@ -7,6 +7,10 @@
 #include "GroomComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Pawns/Bird.h"
+#include "Engine/HitResult.h"
+#include "CollisionShape.h"
+#include "CollisionQueryParams.h"
+#include "Engine/OverlapResult.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -145,7 +149,56 @@ void ABlankCharacter::Look(const FInputActionValue& Value)
 
 }
 
+
 void ABlankCharacter::PossessPlayerController()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Shape: Possess Pressed"));
+
+	FVector Start = GetActorLocation();
+	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
+
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(300.f);
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	// SweepSingleByChannel だと、円形に取得すると地面を感知してしまう
+	bool bHit = GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		Start,
+		FQuat::Identity, // 無回転
+		ECC_Visibility,
+		SphereShape,     // 作成した球体を渡す
+		CollisionParams
+	);
+
+	// デバッグ 円形 緑
+	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
+
+	if (bHit)
+	{
+		for (const FOverlapResult& Hit : OverlapResults)
+		{
+			AActor* HitActor = Hit.GetActor();
+
+			if (ABird* HitBird = Cast<ABird>(HitActor))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
+
+				if (APlayerController* PC = Cast<APlayerController>(GetController()))
+				{
+					PC->Possess(HitBird);
+				}
+
+				return;
+			}
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
+}
+
+void ABlankCharacter::PossessPlayerControllerWithLine()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Possess Pressed!"));
 

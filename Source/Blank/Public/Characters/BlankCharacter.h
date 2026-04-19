@@ -48,6 +48,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void PossessPlayerController();
+	void PossessPlayerControllerWithLine();
 private:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;
