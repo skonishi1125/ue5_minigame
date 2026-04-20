@@ -19,6 +19,7 @@ ABird::ABird()
 	Capsule->SetCapsuleHalfHeight(40.f);
 	Capsule->SetCapsuleRadius(40.f);
 	Capsule->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block); // Ray をキャッチできるようにする
+	Capsule->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block); // Landscape の地面を貫通させない
 	SetRootComponent(Capsule);
 
 	BirdMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
