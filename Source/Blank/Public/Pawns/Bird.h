@@ -13,6 +13,7 @@ class UInputMappingContext;
 class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
+class UFloatingPawnMovement;
 
 UCLASS()
 class BLANK_API ABird : public APawn
@@ -53,6 +54,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* BirdMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	UFloatingPawnMovement* FloatingPawnMovement;
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;

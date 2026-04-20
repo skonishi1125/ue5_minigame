@@ -10,6 +10,7 @@
 #include "Engine/OverlapResult.h"
 #include "CollisionQueryParams.h"
 #include "Characters/BlankCharacter.h"
+#include "GameFramework/FloatingPawnMovement.h"
 
 ABird::ABird()
 {
@@ -25,6 +26,12 @@ ABird::ABird()
 	BirdMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	BirdMesh->SetupAttachment(GetRootComponent()); // = Capsule の子にする
 	BirdMesh->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+
+	// Movement
+	FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("FloatingPawnMovement"));
+	FloatingPawnMovement->MaxSpeed = 1500.f;
+	FloatingPawnMovement->Acceleration = 5000.f; // 入力開始時の加速パラメータ
+	FloatingPawnMovement->Deceleration = 5000.f; // 入力をやめたときの減速パラメータ
 
 	// カメラ系コンポーネント
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmBird"));
@@ -103,11 +110,11 @@ void ABird::Move(const FInputActionValue& Value)
 		const FVector ForwardDirection = GetActorForwardVector();
 		const FVector RightDirection = GetActorRightVector();
 
-		// 移動速度倍率 一旦 10
-		float MoveSpeed = 10.0f;
+		AddMovementInput(ForwardDirection, MovementVector.Y);
+		AddMovementInput(RightDirection, MovementVector.X);
 
-		AddActorWorldOffset(ForwardDirection * MovementVector.Y * MoveSpeed, true);
-		AddActorWorldOffset(RightDirection * MovementVector.X * MoveSpeed, true);
+		//AddActorWorldOffset(ForwardDirection * MovementVector.Y * MoveSpeed, true);
+		//AddActorWorldOffset(RightDirection * MovementVector.X * MoveSpeed, true);
 	}
 }
 
