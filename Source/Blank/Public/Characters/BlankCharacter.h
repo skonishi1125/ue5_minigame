@@ -27,6 +27,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 protected:
 	virtual void BeginPlay() override;
+	virtual void UnPossessed() override;
+
 
 	// ========= 入力関連 ===========
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")

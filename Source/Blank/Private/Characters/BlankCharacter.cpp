@@ -17,6 +17,9 @@ ABlankCharacter::ABlankCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Controller を所持していない場合でも物理演算を有効化する
+	GetCharacterMovement()->bRunPhysicsWithNoController = true;
+
 	// Rayを検知できるようにする
 	UCapsuleComponent* Capsule = GetCapsuleComponent(); // ACharacter デフォルト付与のものを使う
 	Capsule->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
@@ -208,6 +211,20 @@ void ABlankCharacter::PossessPlayerController()
 	UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
 }
 
+// Controller が外れた時に Animation が流しっぱなしとなる挙動を防ぐ
+void ABlankCharacter::UnPossessed()
+{
+	Super::UnPossessed();
+
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	if (MovementComponent != nullptr)
+	{
+		MovementComponent->StopMovementImmediately();
+	}
+
+	StopJumping();
+
+}
 
 
 
