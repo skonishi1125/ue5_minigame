@@ -36,13 +36,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* InteractAction;
 
-	// 移動処理
-	// ↑のようにUXxx* と、ポインタで宣言する場合は前方宣言ができる
-	// ただし、UXxx& というように、参照として引数を取る場合は前方宣言ができないので.hでincludeしてしまう。
+
+	// ========= アクション関連 ===========
+	// ポインタで宣言する場合は前方宣言が使える
+	// ただし参照として引数を取る場合は前方宣言ができない。この場合はもうincludeしてしまってよい
 	void Move(const FInputActionValue& Value);
-
 	void Look(const FInputActionValue& Value);
+	void PossessPlayerController();
 
 private:
 	UPROPERTY(VisibleAnywhere)

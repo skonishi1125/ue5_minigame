@@ -5,8 +5,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Logging/StructuredLog.h"
+#include "CollisionShape.h"
+#include "Engine/OverlapResult.h"
+#include "CollisionQueryParams.h"
+#include "Characters/BlankCharacter.h"
 
-// Sets default values
 ABird::ABird()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -81,6 +85,10 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABird::Look);
 		}
 
+		if (InteractAction)
+		{
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::PossessPlayerController);
+		}
 	}
 
 }
@@ -112,6 +120,50 @@ void ABird::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+
+}
+
+void ABird::PossessPlayerController()
+{
+	// LOGFMT を使ってみる
+	UE_LOGFMT(LogTemp, Display, "Actor :{Name}", this->GetName());
+
+	FVector Start = GetActorLocation();
+	FVector End = Start + (GetActorForwardVector() * 10.f);
+
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(300.f);
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(
+		OverlapResults, Start, FQuat::Identity, ECC_Visibility, SphereShape, CollisionParams
+	);
+
+	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
+
+	if (bHit)
+	{
+		for (const FOverlapResult& Hit : OverlapResults)
+		{
+			AActor* HitActor = Hit.GetActor();
+
+			if (ABlankCharacter* HitCharacter = Cast<ABlankCharacter>(HitActor))
+			{
+				UE_LOGFMT(LogTemp, Display, "Character found :{Name}", HitCharacter->GetName());
+				if (APlayerController* PC = Cast<APlayerController>(GetController()))
+				{
+					PC->Possess(HitCharacter);
+				}
+				return;
+			}
+
+		}
+	}
+	UE_LOGFMT(LogTemp, Verbose, "Character not found.");
+
+
 
 }
 

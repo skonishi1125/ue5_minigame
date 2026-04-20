@@ -11,10 +11,15 @@
 #include "CollisionShape.h"
 #include "CollisionQueryParams.h"
 #include "Engine/OverlapResult.h"
+#include "Components/CapsuleComponent.h"
 
 ABlankCharacter::ABlankCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Rayを検知できるようにする
+	UCapsuleComponent* Capsule = GetCapsuleComponent(); // ACharacter デフォルト付与のものを使う
+	Capsule->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
 	// 進行方向に振り向く設定にするかどうかと、振り向き速度
 	GetCharacterMovement()->bOrientRotationToMovement = true;
