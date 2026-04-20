@@ -198,6 +198,20 @@ void ABlankCharacter::PossessPlayerController()
 	UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
 }
 
+
+
+
+
+
+
+
+
+
+
+
+/*
+	未使用だが、カメラからRayを使ってCollisionを検知するコードの例
+
 void ABlankCharacter::PossessPlayerControllerWithLine()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Possess Pressed!"));
@@ -245,3 +259,4 @@ void ABlankCharacter::PossessPlayerControllerWithLine()
 	}
 
 }
+*/

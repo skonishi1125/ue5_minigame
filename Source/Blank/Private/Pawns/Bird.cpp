@@ -48,12 +48,13 @@ void ABird::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+// Player Controller が渡されたときに発火する
 void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// Mapping Context の登録
-	// GetController()でPawnで使われているコントローラを持ってくる
+	// まずGetController()でPawnに紐づけられたControllerを取得。
 	// それがPlayerのControllerだった時の処理（AIならAIのコントローラが返ってきてスキップするという感じ）
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
