@@ -141,8 +141,8 @@ void ABlankCharacter::Look(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		// Controller (描写されない)に開店を加える
-		// Controller に追従するように傾く設定フラグなどがあるので、追従させたい場合は別途 true としておく
+		// Controller (画面には描写されないもの)に回転を加える
+		// Controller に追従するように傾く設定フラグなどがあるので、今回これに追従させたいので true としておくこと
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
@@ -173,15 +173,20 @@ void ABlankCharacter::PossessPlayerController()
 		CollisionParams
 	);
 
-	// デバッグ 円形 緑
+	// デバッグ 円形 緑 32はどの程度分割して球体を表すか。
 	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
 
 	if (bHit)
 	{
+		// structに対してループを回す場合は、参照として渡す
+		// &がないとループのたびにデータのコピーが発生してパフォーマンスが落ちる
 		for (const FOverlapResult& Hit : OverlapResults)
 		{
+			// UEではActorなどのObjectはポインタで扱うというルールがあるので、それに従う
+			// https://dev.epicgames.com/documentation/unreal-engine/unreal-object-handling-in-unreal-engine?lang=ja (参照の自動更新)
 			AActor* HitActor = Hit.GetActor();
 
+			// Cast()はnullptrが渡されたときでもクラッシュしない設計となっているので、HitActorをnullptrチェックしなくてよい
 			if (ABird* HitBird = Cast<ABird>(HitActor))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
@@ -197,8 +202,6 @@ void ABlankCharacter::PossessPlayerController()
 	}
 	UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
 }
-
-
 
 
 
