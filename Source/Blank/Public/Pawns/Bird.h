@@ -15,6 +15,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UFloatingPawnMovement;
 class UWidgetComponent;
+class USphereComponent;
 
 UCLASS()
 class BLANK_API ABird : public APawn
@@ -50,6 +51,12 @@ protected:
 	void PossessPlayerController();
 
 private:
+	UFUNCTION()
+	void OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	UPROPERTY(VisibleAnywhere)
 	UCapsuleComponent* Capsule;
 
@@ -67,5 +74,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UWidgetComponent* InteractWidget;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* InteractArea; // Character 感知用
 
 };

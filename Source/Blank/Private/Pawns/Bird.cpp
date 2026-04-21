@@ -12,6 +12,7 @@
 #include "Characters/BlankCharacter.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/WidgetComponent.h"
+#include "Components/SphereComponent.h"
 
 ABird::ABird()
 {
@@ -54,13 +55,56 @@ ABird::ABird()
 	InteractWidget->SetupAttachment(GetRootComponent());
 	InteractWidget->SetWidgetSpace(EWidgetSpace::Screen); // カメラに向くようにする
 	InteractWidget->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
-	//InteractWidget->SetVisibility(false);
+	InteractWidget->SetVisibility(false);
+
+	// Interact関連
+	InteractArea = CreateDefaultSubobject<USphereComponent>(TEXT("IntaractArea"));
+	InteractArea->SetSphereRadius(60.f);
+	InteractArea->SetupAttachment(GetRootComponent());
+	InteractArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);// 物理衝突は考慮しないが処理は動かす
+	InteractArea->SetCollisionResponseToAllChannels(ECR_Ignore); // すべて無視
+	InteractArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // Pawn 系だけすり抜け検知する
 
 }
 
 void ABird::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (InteractArea)
+	{
+		InteractArea->OnComponentBeginOverlap.AddDynamic(this, &ABird::OnInteractAreaBeginOverlap);
+		InteractArea->OnComponentEndOverlap.AddDynamic(this, &ABird::OnInteractAreaEndOverlap);
+	}
+
+}
+
+void ABird::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		if (ABlankCharacter* Character = Cast<ABlankCharacter>(OtherActor))
+		{
+			if (InteractWidget)
+			{
+				InteractWidget->SetVisibility(true);
+			}
+		}
+	}
+}
+
+void ABird::OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		if (ABlankCharacter* Character = Cast<ABlankCharacter>(OtherActor))
+		{
+			if (InteractWidget)
+			{
+				InteractWidget->SetVisibility(false);
+			}
+		}
+	}
 }
 
 void ABird::Tick(float DeltaTime)
