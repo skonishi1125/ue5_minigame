@@ -11,6 +11,7 @@
 #include "CollisionQueryParams.h"
 #include "Characters/BlankCharacter.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Components/WidgetComponent.h"
 
 ABird::ABird()
 {
@@ -47,6 +48,13 @@ ABird::ABird()
 	// Controller の Yaw(左右回転)に、Bird 自身も追従させる
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = true;
+
+	// UI系統
+	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
+	InteractWidget->SetupAttachment(GetRootComponent());
+	InteractWidget->SetWidgetSpace(EWidgetSpace::Screen); // カメラに向くようにする
+	InteractWidget->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	//InteractWidget->SetVisibility(false);
 
 }
 

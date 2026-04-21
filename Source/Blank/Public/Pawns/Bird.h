@@ -14,6 +14,7 @@ class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
 class UFloatingPawnMovement;
+class UWidgetComponent;
 
 UCLASS()
 class BLANK_API ABird : public APawn
@@ -63,5 +64,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere)
+	UWidgetComponent* InteractWidget;
 
 };
