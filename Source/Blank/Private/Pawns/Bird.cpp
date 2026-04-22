@@ -81,6 +81,12 @@ void ABird::BeginPlay()
 
 void ABird::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// Bird 操作中の場合は、Player に近づいても自身のインタラクティブキーを出さない
+	if (IsPlayerControlled())
+	{
+		return;
+	}
+
 	if (OtherActor && OtherActor != this)
 	{
 		if (ABlankCharacter* Character = Cast<ABlankCharacter>(OtherActor))
@@ -95,6 +101,12 @@ void ABird::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 
 void ABird::OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	// 離れた時にウィジェットが残りっぱなしだった場合、消えてほしいので return 不要
+	//if (IsPlayerControlled())
+	//{
+	//	return;
+	//}
+
 	if (OtherActor && OtherActor != this)
 	{
 		if (ABlankCharacter* Character = Cast<ABlankCharacter>(OtherActor))
@@ -214,6 +226,10 @@ void ABird::PossessPlayerController()
 				UE_LOGFMT(LogTemp, Display, "Character found :{Name}", HitCharacter->GetName());
 				if (APlayerController* PC = Cast<APlayerController>(GetController()))
 				{
+					if (InteractWidget)
+					{
+						InteractWidget->SetVisibility(false); // [E] の表示を消しておく
+					}
 					PC->Possess(HitCharacter);
 				}
 				return;

@@ -70,6 +70,7 @@ ABlankCharacter::ABlankCharacter()
 	InteractArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	InteractArea->SetCollisionResponseToAllChannels(ECR_Ignore);
 	InteractArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	InteractArea->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 }
 
@@ -180,6 +181,7 @@ void ABlankCharacter::Look(const FInputActionValue& Value)
 }
 
 
+// Player -> Bird に Controller を渡すときの処理
 void ABlankCharacter::PossessPlayerController()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Shape: Possess Pressed"));
@@ -223,6 +225,10 @@ void ABlankCharacter::PossessPlayerController()
 
 				if (APlayerController* PC = Cast<APlayerController>(GetController()))
 				{
+					if (InteractWidget)
+					{
+						InteractWidget->SetVisibility(false); // [E] の表示を消しておく
+					}
 					PC->Possess(HitBird);
 				}
 
@@ -250,6 +256,12 @@ void ABlankCharacter::UnPossessed()
 
 void ABlankCharacter::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// Player 操作中の場合は、Bird に近づいても自身のインタラクティブキーを出さない
+	if (IsPlayerControlled())
+	{
+		return;
+	}
+
 	UE_LOGFMT(LogTemp, Verbose, "Start OnInteractAreaBeginOverlap");
 
 	if (OtherActor && OtherActor != this)
@@ -270,6 +282,12 @@ void ABlankCharacter::OnInteractAreaBeginOverlap(UPrimitiveComponent* Overlapped
 
 void ABlankCharacter::OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	// 離れた時にウィジェットが残りっぱなしだった場合、消えてほしいので return 不要
+	//if (IsPlayerControlled())
+	//{
+	//	return;
+	//}
+
 	if (OtherActor && OtherActor != this)
 	{
 		if (ABird* Bird = Cast<ABird>(OtherActor))
