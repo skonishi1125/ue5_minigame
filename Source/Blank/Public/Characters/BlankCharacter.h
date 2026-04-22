@@ -16,6 +16,10 @@ class UInputAction;
 // Groom 関連
 class UGroomComponent;
 
+// インタラクト
+class UWidgetComponent;
+class USphereComponent;
+
 UCLASS()
 class BLANK_API ABlankCharacter : public ACharacter
 {
@@ -50,8 +54,14 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void PossessPlayerController();
-	void PossessPlayerControllerWithLine();
+	//void PossessPlayerControllerWithLine();
 private:
+	UFUNCTION()
+	void OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;
 
@@ -60,8 +70,14 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	UGroomComponent* Hair;
+
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	UGroomComponent* Eyebrows;
 
+	UPROPERTY(VisibleAnywhere)
+	UWidgetComponent* InteractWidget;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* InteractArea;
 
 };

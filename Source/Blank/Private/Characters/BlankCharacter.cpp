@@ -12,6 +12,9 @@
 #include "CollisionQueryParams.h"
 #include "Engine/OverlapResult.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/SphereComponent.h"
+#include "Logging/StructuredLog.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -53,13 +56,32 @@ ABlankCharacter::ABlankCharacter()
 	Eyebrows->SetupAttachment(GetMesh());
 	Eyebrows->AttachmentName = FString("head");
 
+	// UI 関連
+	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
+	InteractWidget->SetupAttachment(GetRootComponent());
+	InteractWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	InteractWidget->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	InteractWidget->SetVisibility(false);
 
+	// Interact 関連
+	InteractArea = CreateDefaultSubobject<USphereComponent>(TEXT("InteractArea"));
+	InteractArea->SetSphereRadius(60.f);
+	InteractArea->SetupAttachment(GetRootComponent());
+	InteractArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	InteractArea->SetCollisionResponseToAllChannels(ECR_Ignore);
+	InteractArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
 }
 
 void ABlankCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (InteractArea)
+	{
+		InteractArea->OnComponentBeginOverlap.AddDynamic(this, &ABlankCharacter::OnInteractAreaBeginOverlap);
+		InteractArea->OnComponentEndOverlap.AddDynamic(this, &ABlankCharacter::OnInteractAreaEndOverlap);
+	}
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -160,7 +182,7 @@ void ABlankCharacter::Look(const FInputActionValue& Value)
 
 void ABlankCharacter::PossessPlayerController()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shape: Possess Pressed"));
+	//UE_LOG(LogTemp, Warning, TEXT("Shape: Possess Pressed"));
 
 	FVector Start = GetActorLocation();
 	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
@@ -197,7 +219,7 @@ void ABlankCharacter::PossessPlayerController()
 			// Cast()はnullptrが渡されたときでもクラッシュしない設計となっているので、HitActorをnullptrチェックしなくてよい
 			if (ABird* HitBird = Cast<ABird>(HitActor))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
+				//UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
 
 				if (APlayerController* PC = Cast<APlayerController>(GetController()))
 				{
@@ -208,7 +230,7 @@ void ABlankCharacter::PossessPlayerController()
 			}
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
+	//UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
 }
 
 // Controller が外れた時に Animation が流しっぱなしとなる挙動を防ぐ
@@ -226,6 +248,39 @@ void ABlankCharacter::UnPossessed()
 
 }
 
+void ABlankCharacter::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOGFMT(LogTemp, Verbose, "Start OnInteractAreaBeginOverlap");
+
+	if (OtherActor && OtherActor != this)
+	{
+		UE_LOGFMT(LogTemp, Verbose, "Capture OnInteractAreaBeginOverlap");
+
+		if (ABird* Bird = Cast<ABird>(OtherActor))
+		{
+			UE_LOGFMT(LogTemp, Verbose, "Bird OnInteractAreaBeginOverlap");
+
+			if (InteractWidget)
+			{
+				InteractWidget->SetVisibility(true);
+			}
+		}
+	}
+}
+
+void ABlankCharacter::OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		if (ABird* Bird = Cast<ABird>(OtherActor))
+		{
+			if (InteractWidget)
+			{
+				InteractWidget->SetVisibility(false);
+			}
+		}
+	}
+}
 
 
 

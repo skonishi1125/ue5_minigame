@@ -58,7 +58,7 @@ ABird::ABird()
 	InteractWidget->SetVisibility(false);
 
 	// Interact関連
-	InteractArea = CreateDefaultSubobject<USphereComponent>(TEXT("IntaractArea"));
+	InteractArea = CreateDefaultSubobject<USphereComponent>(TEXT("InteractArea"));
 	InteractArea->SetSphereRadius(60.f);
 	InteractArea->SetupAttachment(GetRootComponent());
 	InteractArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);// 物理衝突は考慮しないが処理は動かす
