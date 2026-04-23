@@ -84,20 +84,6 @@ void ABlankCharacter::BeginPlay()
 		InteractArea->OnComponentEndOverlap.AddDynamic(this, &ABlankCharacter::OnInteractAreaEndOverlap);
 	}
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem
-			= ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
-				PlayerController->GetLocalPlayer())
-			)
-		{
-			if (DefaultMappingContext)
-			{
-				Subsystem->AddMappingContext(DefaultMappingContext, 0);
-			}
-		}
-	}
-
 }
 
 void ABlankCharacter::Tick(float DeltaTime)
@@ -110,6 +96,28 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// Mapping Context 登録
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+
+			// Bird から遷移した場合、Bird 側で紐づけたアクションをリセット
+			Subsystem->ClearAllMappings();
+
+
+			if (DefaultMappingContext)
+			{
+				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			}
+			if (CharacterMappingContext)
+			{
+				Subsystem->AddMappingContext(CharacterMappingContext, 1);
+			}
+		}
+	}
+
+	// Action と 対応メソッドのバインド
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		if (MoveAction)

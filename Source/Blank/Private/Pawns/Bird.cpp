@@ -137,9 +137,16 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
+			// Character から遷移した場合、Character 側で紐づけたアクションをリセット
+			Subsystem->ClearAllMappings();
+
 			if (DefaultMappingContext)
 			{
 				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			}
+			if (BirdMappingContext)
+			{
+				Subsystem->AddMappingContext(BirdMappingContext, 1);
 			}
 		}
 	}
@@ -161,6 +168,12 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		{
 			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::PossessPlayerController);
 		}
+
+		if (UpAction)
+		{
+			EnhancedInputComponent->BindAction(UpAction, ETriggerEvent::Triggered, this, &ABird::Up);
+		}
+
 	}
 
 }
@@ -241,6 +254,19 @@ void ABird::PossessPlayerController()
 
 
 
+}
+
+void ABird::Up(const FInputActionValue& Value)
+{
+	float UpValue = Value.Get<float>();
+
+	if (Controller != nullptr && UpValue != 0.f)
+	{
+		UE_LOGFMT(LogTemp, Verbose, "Space Pressed");
+
+		const FVector UpDirection = GetActorUpVector();
+		AddMovementInput(UpDirection, UpValue);
+	}
 }
 
 
