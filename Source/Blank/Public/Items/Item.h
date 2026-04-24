@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class BLANK_API AItem : public AActor
 {
@@ -31,7 +33,7 @@ protected:
 
 	// 回転処理
 	void RotateObject(float DeltaTime);
-	float RotationSpeed = 45.0f; // [deg/s]: 秒間あたり何度回るか
+	float RotationSpeed = 90.0f; // [deg/s]: 秒間あたり何度回るか
 
 private:
 	void SetupComponents();
@@ -39,5 +41,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float RunningTime;
 
+	// コインに触れた時の処理
+	UFUNCTION()
+	void OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* InteractArea;
 
 };

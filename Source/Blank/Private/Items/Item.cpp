@@ -1,4 +1,6 @@
 ﻿#include "Items/Item.h"
+#include "Components/SphereComponent.h"
+#include "Characters/BlankCharacter.h"
 
 float AItem::TransformedSin()
 {
@@ -16,7 +18,13 @@ AItem::AItem()
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("Begin Play Call C++!"));
+	//UE_LOG(LogTemp, Warning, TEXT("Begin Play Call C++!"));
+
+	if (InteractArea)
+	{
+		InteractArea->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnInteractAreaBeginOverlap);
+	}
+
 }
 
 void AItem::Tick(float DeltaTime)
@@ -46,5 +54,28 @@ void AItem::SetupComponents()
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMeshComponent"));
 	ItemMesh->SetupAttachment(RootScene);
+
+	InteractArea = CreateDefaultSubobject<USphereComponent>(TEXT("InteractArea"));
+	InteractArea->SetSphereRadius(60.f);
+	InteractArea->SetupAttachment(RootScene); // SetRootComponent() でもいいと思う
+	InteractArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	InteractArea->SetCollisionResponseToAllChannels(ECR_Ignore);
+	InteractArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+}
+
+void AItem::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		if (ABlankCharacter* Character = Cast<ABlankCharacter>(OtherActor))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Touched Player"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Another touched coin"));
+		}
+	}
 }
 
