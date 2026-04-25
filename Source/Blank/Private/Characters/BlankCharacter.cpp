@@ -145,6 +145,24 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
+void ABlankCharacter::AddCoin()
+{
+	CoinCount++;
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Coin Count: %d"), CoinCount));
+	}
+
+	OnCoinCountChanged.Broadcast(CoinCount);
+
+}
+
+int32 ABlankCharacter::GetCoinCount() const
+{
+	return CoinCount;
+}
+
 void ABlankCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MoveVector = Value.Get<FVector2D>();

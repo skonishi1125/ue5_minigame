@@ -84,6 +84,10 @@ void AItem::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 			{
 				UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
 			}
+
+			// コイン加算処理
+			Character->AddCoin();
+
 			Destroy();
 		}
 		else
