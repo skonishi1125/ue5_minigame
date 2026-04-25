@@ -5,6 +5,7 @@
 #include "Item.generated.h"
 
 class USphereComponent;
+class USoundBase;
 
 UCLASS()
 class BLANK_API AItem : public AActor
@@ -46,5 +47,10 @@ private:
 	void OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* InteractArea;
+
+	// sfx
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* PickupSound;
+	bool bIsPicked = false; // 重複取得を防ぐフラグ
 
 };
