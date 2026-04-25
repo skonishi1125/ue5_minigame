@@ -15,6 +15,8 @@
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
 #include "Logging/StructuredLog.h"
+#include "GameMode/BlankGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -155,6 +157,14 @@ void ABlankCharacter::AddCoin()
 	}
 
 	OnCoinCountChanged.Broadcast(CoinCount);
+
+	// クリア判定
+	// 現在の Level で設定された GameMode を取得し、キャスト
+	if (ABlankGameMode* GameMode = Cast<ABlankGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		GameMode->CheckWinCondition(CoinCount);
+	}
+
 
 }
 
