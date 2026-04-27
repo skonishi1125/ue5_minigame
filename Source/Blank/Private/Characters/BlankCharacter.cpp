@@ -17,6 +17,7 @@
 #include "Logging/StructuredLog.h"
 #include "GameMode/BlankGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CoinComponent.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -73,6 +74,9 @@ ABlankCharacter::ABlankCharacter()
 	InteractArea->SetCollisionResponseToAllChannels(ECR_Ignore);
 	InteractArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	InteractArea->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	// Component 関連
+	CoinComponent = CreateDefaultSubobject<UCoinComponent>(TEXT("CoinComponent"));
 
 }
 
@@ -147,30 +151,15 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
-void ABlankCharacter::AddCoin()
-{
-	CoinCount++;
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Coin Count: %d"), CoinCount));
-	}
-
-	OnCoinCountChanged.Broadcast(CoinCount);
-
-	// クリア判定
-	// 現在の Level で設定された GameMode を取得し、キャスト
-	if (ABlankGameMode* GameMode = Cast<ABlankGameMode>(UGameplayStatics::GetGameMode(this)))
-	{
-		GameMode->CheckWinCondition(CoinCount);
-	}
-
-
-}
 
 int32 ABlankCharacter::GetCoinCount() const
 {
-	return CoinCount;
+	if (CoinComponent)
+	{
+		return CoinComponent->GetCoinCount();
+	}
+
+	return 0;
 }
 
 void ABlankCharacter::Move(const FInputActionValue& Value)

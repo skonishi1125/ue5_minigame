@@ -3,6 +3,7 @@
 #include "Characters/BlankCharacter.h"
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h" // sfx を鳴らすときに使う
+#include "Components/CoinComponent.h"
 
 float AItem::TransformedSin()
 {
@@ -76,19 +77,18 @@ void AItem::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 
 	if (OtherActor && OtherActor != this)
 	{
-		if (ABlankCharacter* Character = Cast<ABlankCharacter>(OtherActor))
+		if (UCoinComponent* TargetCoinComponent = OtherActor->FindComponentByClass<UCoinComponent>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Touched Player"));
+			UE_LOG(LogTemp, Warning, TEXT("Touched an Actor with CoinComponent"));
 			bIsPicked = true;
 			if (PickupSound)
 			{
 				UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
 			}
 
-			// コイン加算処理
-			Character->AddCoin();
-
+			TargetCoinComponent->AddCoin();
 			Destroy();
+
 		}
 		else
 		{
