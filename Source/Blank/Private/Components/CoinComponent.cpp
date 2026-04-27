@@ -1,8 +1,6 @@
 ﻿
 #include "Components/CoinComponent.h"
-#include "GameMode/BlankGameMode.h"
 #include "Kismet/GameplayStatics.h"
-
 
 UCoinComponent::UCoinComponent()
 {
@@ -29,12 +27,6 @@ void UCoinComponent::AddCoin()
 	}
 
 	OnCoinCountChanged.Broadcast(CoinCount);
-
-	if (ABlankGameMode* GameMode = Cast<ABlankGameMode>(UGameplayStatics::GetGameMode(this)))
-	{
-		GameMode->CheckWinCondition(CoinCount);
-	}
-
 }
 
 int32 UCoinComponent::GetCoinCount() const

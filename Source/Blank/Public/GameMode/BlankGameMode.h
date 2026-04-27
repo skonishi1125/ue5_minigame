@@ -10,6 +10,7 @@ class BLANK_API ABlankGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	virtual void BeginPlay() override;
 	void CheckWinCondition(int32 CurrentCoinCount);
 
 protected:
@@ -21,5 +22,7 @@ protected:
 	void OnGameCleared();
 
 private:
+	UFUNCTION()
+	void HandleCoinCountChanged(int32 NewCoinCount);
 
 };
