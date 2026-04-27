@@ -1,5 +1,5 @@
-﻿#include "Logging/StructuredLog.h"
-#include "GameMode/BlankGameMode.h"
+﻿#include "GameMode/BlankGameMode.h"
+#include "Logging/StructuredLog.h"
 
 void ABlankGameMode::CheckWinCondition(int32 CurrentCoinCount)
 {

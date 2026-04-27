@@ -46,6 +46,8 @@ ABlankCharacter::ABlankCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+	Camera->bConstrainAspectRatio = true;
+	Camera->AspectRatio = 16.0f / 9.0f;
 
 	// Auto Possess Player の設定。 不要かも
 	//AutoPossessPlayer = EAutoReceiveInput::Player0;
