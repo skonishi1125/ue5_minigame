@@ -18,10 +18,9 @@ void ABlankGameMode::BeginPlay()
 	}
 }
 
-// デリゲートがBroadcastされた時に自動で呼ばれる関数
+// デリゲート用 Broadcast時に自動で呼ばれる関数
 void ABlankGameMode::HandleCoinCountChanged(int32 NewCoinCount)
 {
-	// ここで本来のクリア判定処理へ流す
 	CheckWinCondition(NewCoinCount);
 }
 
