@@ -2,6 +2,7 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 
+// UI が画面生成されたときに一度だけ呼ばれる処理
 void UTitleWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
