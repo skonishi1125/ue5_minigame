@@ -8,6 +8,14 @@ void ABlankGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Title から遷移したとき、Controller の InputMode をゲームの入力が効くように調整
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
+		PC->bShowMouseCursor = false;
+	}
+
 	if (ABlankCharacter* BlankCharacter = Cast<ABlankCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0))) {
 		if (UCoinComponent* CoinComponent = BlankCharacter->FindComponentByClass<UCoinComponent>())
 		{
