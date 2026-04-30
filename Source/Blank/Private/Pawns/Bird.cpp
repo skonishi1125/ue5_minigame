@@ -71,6 +71,10 @@ void ABird::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 開始時の位置を記録
+	DefaultSpawnTransform = GetActorTransform();
+	UE_LOGFMT(LogTemp, Warning, "Bird's Default Spawn Locate: {Transform}", DefaultSpawnTransform.ToHumanReadableString()); // .ToString()でも良い
+
 	if (InteractArea)
 	{
 		InteractArea->OnComponentBeginOverlap.AddDynamic(this, &ABird::OnInteractAreaBeginOverlap);
@@ -166,7 +170,7 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		if (InteractAction)
 		{
-			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::PossessPlayerController);
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::PossessPlayerControllerAnyWhere);
 		}
 
 		if (UpAction)
@@ -177,6 +181,12 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	}
 
 }
+
+void ABird::SetBlankCharacter(ABlankCharacter* Character)
+{
+	BlankCharacter = Character;
+}
+
 
 void ABird::Move(const FInputActionValue& Value)
 {
@@ -207,6 +217,39 @@ void ABird::Look(const FInputActionValue& Value)
 	}
 
 }
+
+void ABird::PossessPlayerControllerAnyWhere()
+{
+	if (BlankCharacter != nullptr)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			if (InteractWidget)
+			{
+				InteractWidget->SetVisibility(false);
+			}
+			PC->Possess(BlankCharacter);
+			this->SetActorLocation(DefaultSpawnTransform.GetLocation(), false);
+		}
+	}
+}
+
+void ABird::Up(const FInputActionValue& Value)
+{
+	float UpValue = Value.Get<float>();
+
+	if (Controller != nullptr && UpValue != 0.f)
+	{
+		UE_LOGFMT(LogTemp, Verbose, "Space Pressed");
+
+		const FVector UpDirection = GetActorUpVector();
+		AddMovementInput(UpDirection, UpValue);
+	}
+}
+
+
+
+/*
 
 void ABird::PossessPlayerController()
 {
@@ -251,22 +294,9 @@ void ABird::PossessPlayerController()
 		}
 	}
 	UE_LOGFMT(LogTemp, Verbose, "Character not found.");
-
-
-
 }
 
-void ABird::Up(const FInputActionValue& Value)
-{
-	float UpValue = Value.Get<float>();
+*/
 
-	if (Controller != nullptr && UpValue != 0.f)
-	{
-		UE_LOGFMT(LogTemp, Verbose, "Space Pressed");
-
-		const FVector UpDirection = GetActorUpVector();
-		AddMovementInput(UpDirection, UpValue);
-	}
-}
 
 

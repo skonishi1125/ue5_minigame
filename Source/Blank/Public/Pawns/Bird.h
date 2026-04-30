@@ -17,6 +17,8 @@ class UFloatingPawnMovement;
 class UWidgetComponent;
 class USphereComponent;
 
+class ABlankCharacter;
+
 UCLASS()
 class BLANK_API ABird : public APawn
 {
@@ -25,6 +27,9 @@ public:
 	ABird();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void SetBlankCharacter(ABlankCharacter* Character);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -49,10 +54,16 @@ protected:
 	// ただし参照として引数を取る場合は前方宣言ができない。この場合はもうincludeしてしまってよい
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void PossessPlayerController();
+	//void PossessPlayerController();
+	void PossessPlayerControllerAnyWhere();
 	void Up(const FInputActionValue& Value);
 
 private:
+	UPROPERTY(VisibleAnywhere)
+	FTransform DefaultSpawnTransform;
+
+
+
 	UFUNCTION()
 	void OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -79,5 +90,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* InteractArea; // Character 感知用
+
+	UPROPERTY(EditAnywhere, Category = "Possess")
+	ABlankCharacter* BlankCharacter;
+
 
 };

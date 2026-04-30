@@ -248,6 +248,8 @@ void ABlankCharacter::PossessPlayerController()
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
 
+				HitBird->SetBlankCharacter(this);
+
 				if (APlayerController* PC = Cast<APlayerController>(GetController()))
 				{
 					if (InteractWidget)
