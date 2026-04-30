@@ -18,6 +18,8 @@
 #include "GameMode/BlankGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CoinComponent.h"
+#include "Controller/BlankPlayerController.h"
+#include "GameFramework/Pawn.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -244,22 +246,30 @@ void ABlankCharacter::PossessPlayerController()
 			AActor* HitActor = Hit.GetActor();
 
 			// Cast()はnullptrが渡されたときでもクラッシュしない設計となっているので、HitActorをnullptrチェックしなくてよい
-			if (ABird* HitBird = Cast<ABird>(HitActor))
+			//if (ABird* HitBird = Cast<ABird>(HitActor))
+			//{
+			//	//UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
+
+			//	HitBird->SetBlankCharacter(this);
+
+			//	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+			//	{
+			//		if (InteractWidget)
+			//		{
+			//			InteractWidget->SetVisibility(false); // [E] の表示を消しておく
+			//		}
+			//		PC->Possess(HitBird);
+			//	}
+
+			//	return;
+			//}
+
+			if (APawn* TargetPawn = Cast<APawn>(HitActor))
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
-
-				HitBird->SetBlankCharacter(this);
-
-				if (APlayerController* PC = Cast<APlayerController>(GetController()))
+				if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetController()))
 				{
-					if (InteractWidget)
-					{
-						InteractWidget->SetVisibility(false); // [E] の表示を消しておく
-					}
-					PC->Possess(HitBird);
+					PC->PossessToNewPawn(TargetPawn);
 				}
-
-				return;
 			}
 		}
 	}

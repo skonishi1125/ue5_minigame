@@ -13,6 +13,7 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
+#include "Controller/BlankPlayerController.h"
 
 ABird::ABird()
 {
@@ -220,18 +221,29 @@ void ABird::Look(const FInputActionValue& Value)
 
 void ABird::PossessPlayerControllerAnyWhere()
 {
-	if (BlankCharacter != nullptr)
+	//if (BlankCharacter != nullptr)
+	//{
+	//	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	//	{
+	//		if (InteractWidget)
+	//		{
+	//			InteractWidget->SetVisibility(false);
+	//		}
+	//		PC->Possess(BlankCharacter);
+	//		this->SetActorLocation(DefaultSpawnTransform.GetLocation(), false);
+	//	}
+	//}
+
+	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetController()))
 	{
-		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		if (InteractWidget)
 		{
-			if (InteractWidget)
-			{
-				InteractWidget->SetVisibility(false);
-			}
-			PC->Possess(BlankCharacter);
-			this->SetActorLocation(DefaultSpawnTransform.GetLocation(), false);
+			InteractWidget->SetVisibility(false);
 		}
+		PC->ReturnToOriginalPawn();
+		this->SetActorLocation(DefaultSpawnTransform.GetLocation(), false);
 	}
+
 }
 
 void ABird::Up(const FInputActionValue& Value)
