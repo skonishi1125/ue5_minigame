@@ -47,6 +47,11 @@ void ASignboard::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ASignboard::Interact(ABlankCharacter* Interactor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("看板を読みました！テキスト: %s"), *MessageText.ToString());
+}
+
 void ASignboard::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != this)

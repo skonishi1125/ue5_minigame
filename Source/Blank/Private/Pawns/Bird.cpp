@@ -188,6 +188,12 @@ void ABird::SetBlankCharacter(ABlankCharacter* Character)
 	BlankCharacter = Character;
 }
 
+// Player から Bird に Controller を渡す
+void ABird::Interact(ABlankCharacter* Interactor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Bird::Interact インタラクト処理"));
+}
+
 
 void ABird::Move(const FInputActionValue& Value)
 {

@@ -20,6 +20,7 @@
 #include "Components/CoinComponent.h"
 #include "Controller/BlankPlayerController.h"
 #include "GameFramework/Pawn.h"
+#include "Interface/Interactable.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -146,7 +147,9 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 		if (InteractAction)
 		{
-			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABlankCharacter::PossessPlayerController);
+			//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABlankCharacter::PossessPlayerController);
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABlankCharacter::ExecInteractive);
+
 		}
 
 	}
@@ -204,6 +207,46 @@ void ABlankCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+
+}
+
+
+void ABlankCharacter::ExecInteractive()
+{
+	UE_LOG(LogTemp, Warning, TEXT("BlankCharacter::ExecInteractive"));
+
+	FVector Start = GetActorLocation();
+	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
+
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(300.f);
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	// SweepSingleByChannel だと、円形に取得すると地面を感知してしまう
+	bool bHit = GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		Start,
+		FQuat::Identity, // 無回転
+		ECC_Visibility,
+		SphereShape,     // 作成した球体を渡す
+		CollisionParams
+	);
+
+	if (bHit)
+	{
+		for (const FOverlapResult& Hit : OverlapResults)
+		{
+			AActor* HitActor = Hit.GetActor();
+			if (IInteractable* InteractableTarget = Cast<IInteractable>(HitActor))
+			{
+				InteractableTarget->Interact(this);
+				return;
+			}
+		}
+	}
+
 
 }
 
@@ -275,6 +318,8 @@ void ABlankCharacter::PossessPlayerController()
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
 }
+
+
 
 // Controller が外れた時に Animation が流しっぱなしとなる挙動を防ぐ
 void ABlankCharacter::UnPossessed()

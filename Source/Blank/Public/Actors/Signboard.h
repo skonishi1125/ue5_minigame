@@ -2,21 +2,26 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/Interactable.h"
+
 #include "Signboard.generated.h"
 
 class USceneComponent;
 class UStaticMeshComponent;
 class USphereComponent;
 class UWidgetComponent;
+class ABlankCharacter;
 
 UCLASS()
-class BLANK_API ASignboard : public AActor
+class BLANK_API ASignboard : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 
 public:
 	ASignboard();
 	virtual void Tick(float DeltaTime) override;
+	virtual void Interact(ABlankCharacter* Interactor) override;
+
 protected:
 	virtual void BeginPlay() override;
 private:

@@ -1,10 +1,10 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "InputActionValue.h"
+#include "Interface/Interactable.h"
+
 #include "Bird.generated.h"
 
 class UCapsuleComponent;
@@ -16,11 +16,10 @@ class UCameraComponent;
 class UFloatingPawnMovement;
 class UWidgetComponent;
 class USphereComponent;
-
 class ABlankCharacter;
 
 UCLASS()
-class BLANK_API ABird : public APawn
+class BLANK_API ABird : public APawn, public IInteractable
 {
 	GENERATED_BODY()
 public:
@@ -29,6 +28,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetBlankCharacter(ABlankCharacter* Character);
+	void Interact(ABlankCharacter* Interactor) override;
 
 protected:
 	virtual void BeginPlay() override;
