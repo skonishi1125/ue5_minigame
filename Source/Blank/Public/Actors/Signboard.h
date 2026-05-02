@@ -6,6 +6,8 @@
 
 class USceneComponent;
 class UStaticMeshComponent;
+class USphereComponent;
+class UWidgetComponent;
 
 UCLASS()
 class BLANK_API ASignboard : public AActor
@@ -19,10 +21,28 @@ protected:
 	virtual void BeginPlay() override;
 private:
 	// C++ からは継承不可だが、UE上からはアクセスできる
-	// RO というのは、BPでメッシュを割り当てることは可能だが、ノードなどで置き換える処理に制限をかけている
+	// RO は、BPでメッシュを割り当てることは可能だが、ノードなどで置換する処理に制限をかけている状態
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USceneComponent> RootScene;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> SignboardMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USphereComponent> InteractArea;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FText MessageText;
+
+	// TODO; これはなぜallowprivateaccess無しでもよいのか調べる
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UWidgetComponent> InteractWidget;
+
+	UFUNCTION()
+	void OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
 };
