@@ -218,7 +218,7 @@ void ABlankCharacter::ExecInteractive()
 	FVector Start = GetActorLocation();
 	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
 
-	FCollisionShape SphereShape = FCollisionShape::MakeSphere(300.f);
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(120.f);
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionParams;
@@ -234,11 +234,15 @@ void ABlankCharacter::ExecInteractive()
 		CollisionParams
 	);
 
+	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
+
 	if (bHit)
 	{
 		for (const FOverlapResult& Hit : OverlapResults)
 		{
 			AActor* HitActor = Hit.GetActor();
+
+			// 対象に Interface があればそれを実行
 			if (IInteractable* InteractableTarget = Cast<IInteractable>(HitActor))
 			{
 				InteractableTarget->Interact(this);
@@ -249,76 +253,6 @@ void ABlankCharacter::ExecInteractive()
 
 
 }
-
-
-// Player -> Bird に Controller を渡すときの処理
-void ABlankCharacter::PossessPlayerController()
-{
-	//UE_LOG(LogTemp, Warning, TEXT("Shape: Possess Pressed"));
-
-	FVector Start = GetActorLocation();
-	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
-
-	FCollisionShape SphereShape = FCollisionShape::MakeSphere(300.f);
-
-	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this);
-
-	// SweepSingleByChannel だと、円形に取得すると地面を感知してしまう
-	bool bHit = GetWorld()->OverlapMultiByChannel(
-		OverlapResults,
-		Start,
-		FQuat::Identity, // 無回転
-		ECC_Visibility,
-		SphereShape,     // 作成した球体を渡す
-		CollisionParams
-	);
-
-	// デバッグ 円形 緑 32はどの程度分割して球体を表すか。
-	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
-
-	if (bHit)
-	{
-		// structに対してループを回す場合は、参照として渡す
-		// &がないとループのたびにデータのコピーが発生してパフォーマンスが落ちる
-		for (const FOverlapResult& Hit : OverlapResults)
-		{
-			// UEではActorなどのObjectはポインタで扱うというルールがあるので、それに従う
-			// https://dev.epicgames.com/documentation/unreal-engine/unreal-object-handling-in-unreal-engine?lang=ja (参照の自動更新)
-			AActor* HitActor = Hit.GetActor();
-
-			// Cast()はnullptrが渡されたときでもクラッシュしない設計となっているので、HitActorをnullptrチェックしなくてよい
-			//if (ABird* HitBird = Cast<ABird>(HitActor))
-			//{
-			//	//UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
-
-			//	HitBird->SetBlankCharacter(this);
-
-			//	if (APlayerController* PC = Cast<APlayerController>(GetController()))
-			//	{
-			//		if (InteractWidget)
-			//		{
-			//			InteractWidget->SetVisibility(false); // [E] の表示を消しておく
-			//		}
-			//		PC->Possess(HitBird);
-			//	}
-
-			//	return;
-			//}
-
-			if (APawn* TargetPawn = Cast<APawn>(HitActor))
-			{
-				if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetController()))
-				{
-					PC->PossessToNewPawn(TargetPawn);
-				}
-			}
-		}
-	}
-	//UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
-}
-
 
 
 // Controller が外れた時に Animation が流しっぱなしとなる挙動を防ぐ
@@ -391,6 +325,76 @@ void ABlankCharacter::OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedCo
 
 /*
 	未使用だが、カメラからRayを使ってCollisionを検知するコードの例
+
+
+// Player -> Bird に Controller を渡すときの処理
+void ABlankCharacter::PossessPlayerController()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Shape: Possess Pressed"));
+
+	FVector Start = GetActorLocation();
+	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
+
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(300.f);
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	// SweepSingleByChannel だと、円形に取得すると地面を感知してしまう
+	bool bHit = GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		Start,
+		FQuat::Identity, // 無回転
+		ECC_Visibility,
+		SphereShape,     // 作成した球体を渡す
+		CollisionParams
+	);
+
+	// デバッグ 円形 緑 32はどの程度分割して球体を表すか。
+	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
+
+	if (bHit)
+	{
+		// structに対してループを回す場合は、参照として渡す
+		// &がないとループのたびにデータのコピーが発生してパフォーマンスが落ちる
+		for (const FOverlapResult& Hit : OverlapResults)
+		{
+			// UEではActorなどのObjectはポインタで扱うというルールがあるので、それに従う
+			// https://dev.epicgames.com/documentation/unreal-engine/unreal-object-handling-in-unreal-engine?lang=ja (参照の自動更新)
+			AActor* HitActor = Hit.GetActor();
+
+			// Cast()はnullptrが渡されたときでもクラッシュしない設計となっているので、HitActorをnullptrチェックしなくてよい
+			//if (ABird* HitBird = Cast<ABird>(HitActor))
+			//{
+			//	//UE_LOG(LogTemp, Warning, TEXT("Bird Found in Sphere!"));
+
+			//	HitBird->SetBlankCharacter(this);
+
+			//	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+			//	{
+			//		if (InteractWidget)
+			//		{
+			//			InteractWidget->SetVisibility(false); // [E] の表示を消しておく
+			//		}
+			//		PC->Possess(HitBird);
+			//	}
+
+			//	return;
+			//}
+
+			if (APawn* TargetPawn = Cast<APawn>(HitActor))
+			{
+				if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetController()))
+				{
+					PC->PossessToNewPawn(TargetPawn);
+				}
+			}
+		}
+	}
+	//UE_LOG(LogTemp, Warning, TEXT("No Bird nearby"));
+}
+
 
 void ABlankCharacter::PossessPlayerControllerWithLine()
 {

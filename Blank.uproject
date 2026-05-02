@@ -155,6 +155,10 @@
 		{
 			"Name": "MovieRenderPipeline",
 			"Enabled": true
+		},
+		{
+			"Name": "UdpMessaging",
+			"Enabled": false
 		}
 	]
 }

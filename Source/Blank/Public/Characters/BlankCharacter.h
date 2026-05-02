@@ -63,8 +63,8 @@ protected:
 	// ========= アクション関連 ===========
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void PossessPlayerController();
 	void ExecInteractive();
+	//void PossessPlayerController();
 	//void PossessPlayerControllerWithLine();
 private:
 	UFUNCTION()

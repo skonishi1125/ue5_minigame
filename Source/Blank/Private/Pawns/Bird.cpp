@@ -192,6 +192,16 @@ void ABird::SetBlankCharacter(ABlankCharacter* Character)
 void ABird::Interact(ABlankCharacter* Interactor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Bird::Interact インタラクト処理"));
+
+	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
+	{
+		PC->PossessToNewPawn(this);
+		if (InteractWidget)
+		{
+			InteractWidget->SetVisibility(false); // [E] の表示を消しておく
+		}
+	}
+
 }
 
 
