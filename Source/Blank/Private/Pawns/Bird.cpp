@@ -171,9 +171,7 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		if (InteractAction)
 		{
-			//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::PossessPlayerControllerAnyWhere);
-			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::ExecInteractive);
-
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::PossessPlayerControllerAnyWhere);
 		}
 
 		if (UpAction)
@@ -190,22 +188,25 @@ void ABird::SetBlankCharacter(ABlankCharacter* Character)
 	BlankCharacter = Character;
 }
 
-// Player から Bird に Controller を渡す
+// Characterにインタラクトされたときの処理
+// コントローラを渡して、自身のBlankCharacterにCharacterを保持し、ウィジェットを消す
 void ABird::Interact(APawn* Interactor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Bird::Interact インタラクト処理"));
+	UE_LOG(LogTemp, Warning, TEXT("Bird::Interact"));
 
 	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
 	{
 		PC->PossessToNewPawn(this);
+		if (ABlankCharacter* CastToBlankCharacter = Cast<ABlankCharacter>(Interactor))
+		{
+			ABird::SetBlankCharacter(CastToBlankCharacter);
+		}
 		if (InteractWidget)
 		{
 			InteractWidget->SetVisibility(false); // [E] の表示を消しておく
 		}
 	}
-
 }
-
 
 void ABird::Move(const FInputActionValue& Value)
 {
@@ -237,75 +238,6 @@ void ABird::Look(const FInputActionValue& Value)
 
 }
 
-void ABird::PossessPlayerControllerAnyWhere()
-{
-	//if (BlankCharacter != nullptr)
-	//{
-	//	if (APlayerController* PC = Cast<APlayerController>(GetController()))
-	//	{
-	//		if (InteractWidget)
-	//		{
-	//			InteractWidget->SetVisibility(false);
-	//		}
-	//		PC->Possess(BlankCharacter);
-	//		this->SetActorLocation(DefaultSpawnTransform.GetLocation(), false);
-	//	}
-	//}
-
-	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetController()))
-	{
-		if (InteractWidget)
-		{
-			InteractWidget->SetVisibility(false);
-		}
-		PC->ReturnToOriginalPawn();
-		this->SetActorLocation(DefaultSpawnTransform.GetLocation(), false);
-	}
-
-}
-
-void ABird::ExecInteractive()
-{
-	UE_LOG(LogTemp, Warning, TEXT("ABird::ExecInteractive"));
-
-	FVector Start = GetActorLocation();
-	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
-	FCollisionShape SphereShape = FCollisionShape::MakeSphere(120.f);
-
-	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this);
-
-	// SweepSingleByChannel だと、円形に取得すると地面を感知してしまう
-	bool bHit = GetWorld()->OverlapMultiByChannel(
-		OverlapResults,
-		Start,
-		FQuat::Identity, // 無回転
-		ECC_Visibility,
-		SphereShape,     // 作成した球体を渡す
-		CollisionParams
-	);
-
-	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
-
-	if (bHit)
-	{
-		for (const FOverlapResult& Hit : OverlapResults)
-		{
-			AActor* HitActor = Hit.GetActor();
-
-			// 対象に Interface があればそれを実行
-			if (IInteractable* InteractableTarget = Cast<IInteractable>(HitActor))
-			{
-				InteractableTarget->Interact(this);
-				return;
-			}
-		}
-	}
-
-
-}
-
 void ABird::Up(const FInputActionValue& Value)
 {
 	float UpValue = Value.Get<float>();
@@ -319,6 +251,21 @@ void ABird::Up(const FInputActionValue& Value)
 	}
 }
 
+void ABird::PossessPlayerControllerAnyWhere()
+{
+	if (BlankCharacter != nullptr)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			if (InteractWidget)
+			{
+				InteractWidget->SetVisibility(false);
+			}
+			PC->Possess(BlankCharacter);
+			this->SetActorLocation(DefaultSpawnTransform.GetLocation(), false);
+		}
+	}
+}
 
 
 /*
@@ -367,6 +314,47 @@ void ABird::PossessPlayerController()
 	}
 	UE_LOGFMT(LogTemp, Verbose, "Character not found.");
 }
+
+void ABird::ExecInteractive()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ABird::ExecInteractive"));
+
+	FVector Start = GetActorLocation();
+	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(120.f);
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	// SweepSingleByChannel だと、円形に取得すると地面を感知してしまう
+	bool bHit = GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		Start,
+		FQuat::Identity, // 無回転
+		ECC_Visibility,
+		SphereShape,     // 作成した球体を渡す
+		CollisionParams
+	);
+
+	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
+
+	if (bHit)
+	{
+		for (const FOverlapResult& Hit : OverlapResults)
+		{
+			AActor* HitActor = Hit.GetActor();
+
+			// 対象に Interface があればそれを実行
+			if (IInteractable* InteractableTarget = Cast<IInteractable>(HitActor))
+			{
+				InteractableTarget->Interact(this);
+				return;
+			}
+		}
+	}
+}
+
 
 */
 

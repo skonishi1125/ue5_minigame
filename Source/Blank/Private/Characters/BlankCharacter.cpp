@@ -71,7 +71,7 @@ ABlankCharacter::ABlankCharacter()
 
 	// Interact 関連
 	InteractArea = CreateDefaultSubobject<USphereComponent>(TEXT("InteractArea"));
-	InteractArea->SetSphereRadius(60.f);
+	InteractArea->SetSphereRadius(InteractAreaRadius);
 	InteractArea->SetupAttachment(GetRootComponent());
 	InteractArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	InteractArea->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -156,21 +156,6 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
-// Bird から Player に Controller を渡す
-void ABlankCharacter::Interact(APawn* Interactor)
-{
-	UE_LOG(LogTemp, Warning, TEXT("ABlankCharacter::Interact"));
-	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
-	{
-		PC->PossessToNewPawn(this);
-		if (InteractWidget)
-		{
-			InteractWidget->SetVisibility(false); // [E] の表示を消しておく
-		}
-	}
-}
-
-
 int32 ABlankCharacter::GetCoinCount() const
 {
 	if (CoinComponent)
@@ -231,7 +216,7 @@ void ABlankCharacter::ExecInteractive()
 
 	FVector Start = GetActorLocation();
 	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
-	FCollisionShape SphereShape = FCollisionShape::MakeSphere(120.f);
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(InteractAreaRadius);
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionParams;
@@ -456,4 +441,19 @@ void ABlankCharacter::PossessPlayerControllerWithLine()
 	}
 
 }
+
+// Bird から Player に Controller を渡す
+void ABlankCharacter::Interact(APawn* Interactor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ABlankCharacter::Interact"));
+	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
+	{
+		PC->PossessToNewPawn(this);
+		if (InteractWidget)
+		{
+			InteractWidget->SetVisibility(false); // [E] の表示を消しておく
+		}
+	}
+}
+
 */

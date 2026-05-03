@@ -54,10 +54,10 @@ protected:
 	// ただし参照として引数を取る場合は前方宣言ができない。この場合はもうincludeしてしまってよい
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	//void PossessPlayerController();
-	void PossessPlayerControllerAnyWhere();
-	void ExecInteractive();
 	void Up(const FInputActionValue& Value);
+	void PossessPlayerControllerAnyWhere();
+	//void PossessPlayerController();
+	//void ExecInteractive();
 
 private:
 	UPROPERTY(VisibleAnywhere)

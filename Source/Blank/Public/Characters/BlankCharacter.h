@@ -26,7 +26,7 @@ class USphereComponent;
 class UCoinComponent;
 
 UCLASS()
-class BLANK_API ABlankCharacter : public ACharacter, public IInteractable
+class BLANK_API ABlankCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -34,7 +34,7 @@ public:
 	ABlankCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void Interact(APawn* Interactor) override;
+	//void Interact(APawn* Interactor) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
 	int32 GetCoinCount() const;
@@ -94,9 +94,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* InteractArea;
 
-	// 取得コイン
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", meta = (AllowPrivateAccess = "true"))
-	int32 CoinCount = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float InteractAreaRadius = 80.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCoinComponent* CoinComponent;
