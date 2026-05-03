@@ -10,7 +10,6 @@ class USceneComponent;
 class UStaticMeshComponent;
 class USphereComponent;
 class UWidgetComponent;
-class ABlankCharacter;
 
 UCLASS()
 class BLANK_API ASignboard : public AActor, public IInteractable
@@ -20,7 +19,7 @@ class BLANK_API ASignboard : public AActor, public IInteractable
 public:
 	ASignboard();
 	virtual void Tick(float DeltaTime) override;
-	virtual void Interact(ABlankCharacter* Interactor) override;
+	virtual void Interact(APawn* Interactor) override;
 
 protected:
 	virtual void BeginPlay() override;

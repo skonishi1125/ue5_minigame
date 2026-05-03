@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Interface/Interactable.h"
+
 #include "BlankCharacter.generated.h"
 
 // カメラ
@@ -24,7 +26,7 @@ class USphereComponent;
 class UCoinComponent;
 
 UCLASS()
-class BLANK_API ABlankCharacter : public ACharacter
+class BLANK_API ABlankCharacter : public ACharacter, public IInteractable
 {
 	GENERATED_BODY()
 
@@ -32,6 +34,7 @@ public:
 	ABlankCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void Interact(APawn* Interactor) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
 	int32 GetCoinCount() const;

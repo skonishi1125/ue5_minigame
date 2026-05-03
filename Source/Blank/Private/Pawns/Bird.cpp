@@ -171,7 +171,9 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		if (InteractAction)
 		{
-			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::PossessPlayerControllerAnyWhere);
+			//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::PossessPlayerControllerAnyWhere);
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABird::ExecInteractive);
+
 		}
 
 		if (UpAction)
@@ -189,7 +191,7 @@ void ABird::SetBlankCharacter(ABlankCharacter* Character)
 }
 
 // Player から Bird に Controller を渡す
-void ABird::Interact(ABlankCharacter* Interactor)
+void ABird::Interact(APawn* Interactor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Bird::Interact インタラクト処理"));
 
@@ -259,6 +261,48 @@ void ABird::PossessPlayerControllerAnyWhere()
 		PC->ReturnToOriginalPawn();
 		this->SetActorLocation(DefaultSpawnTransform.GetLocation(), false);
 	}
+
+}
+
+void ABird::ExecInteractive()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ABird::ExecInteractive"));
+
+	FVector Start = GetActorLocation();
+	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(120.f);
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	// SweepSingleByChannel だと、円形に取得すると地面を感知してしまう
+	bool bHit = GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		Start,
+		FQuat::Identity, // 無回転
+		ECC_Visibility,
+		SphereShape,     // 作成した球体を渡す
+		CollisionParams
+	);
+
+	DrawDebugSphere(GetWorld(), Start, SphereShape.GetSphereRadius(), 32, bHit ? FColor::Green : FColor::Red, false, 2.f);
+
+	if (bHit)
+	{
+		for (const FOverlapResult& Hit : OverlapResults)
+		{
+			AActor* HitActor = Hit.GetActor();
+
+			// 対象に Interface があればそれを実行
+			if (IInteractable* InteractableTarget = Cast<IInteractable>(HitActor))
+			{
+				InteractableTarget->Interact(this);
+				return;
+			}
+		}
+	}
+
 
 }
 

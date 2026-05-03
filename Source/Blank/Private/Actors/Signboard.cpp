@@ -47,7 +47,7 @@ void ASignboard::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ASignboard::Interact(ABlankCharacter* Interactor)
+void ASignboard::Interact(APawn* Interactor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("看板を読みました！テキスト: %s"), *MessageText.ToString());
 }

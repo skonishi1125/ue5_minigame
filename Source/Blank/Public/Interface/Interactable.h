@@ -4,8 +4,6 @@
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
 
-class ABlankCharacter;
-
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInteractable : public UInterface
@@ -21,5 +19,5 @@ class BLANK_API IInteractable
 public:
 	// Eキーを押したときのインタラクト実行関数 引数として、誰がインタラクトしたかを受け取っておく
 	// = 0 : 純粋仮想関数。このInterfaceを継承するクラスは必ずこの処理を実装するという制約を持たせる
-	virtual void Interact(ABlankCharacter* Interactor) = 0;
+	virtual void Interact(APawn* Interactor) = 0;
 };
