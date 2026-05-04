@@ -38,8 +38,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FText MessageText;
 
-	// TODO; これはなぜallowprivateaccess無しでもよいのか調べる
-	UPROPERTY(VisibleAnywhere)
+	// allowprivateaccess 無しでもエラーは出ない
+	// C++のコンパイラがポインタの宣言自体は許容する, 現在UE側でエラーは出ないという仕様
+	// ただし今後のver upどで弾かれるようになりうるため、付けておく
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UWidgetComponent> InteractWidget;
 
 	UFUNCTION()

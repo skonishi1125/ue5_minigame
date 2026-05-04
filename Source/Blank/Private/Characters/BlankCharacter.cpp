@@ -214,6 +214,17 @@ void ABlankCharacter::ExecInteractive()
 {
 	UE_LOG(LogTemp, Warning, TEXT("BlankCharacter::ExecInteractive"));
 
+	// 1. テキストウィンドウUI が開いている状態であれば、閉じるという処理を行う
+	if (ABlankPlayerController* PC = Cast <ABlankPlayerController>(GetController()))
+	{
+		if (PC->IsDialogueOpen())
+		{
+			PC->CloseDialogue();
+			return;
+		}
+	}
+
+	// 2. 通常ゲームプレイ時であれば、インタラクト処理
 	FVector Start = GetActorLocation();
 	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
 	FCollisionShape SphereShape = FCollisionShape::MakeSphere(InteractAreaRadius);

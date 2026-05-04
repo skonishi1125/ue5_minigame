@@ -4,6 +4,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Characters/BlankCharacter.h"
+#include "Controller/BlankPlayerController.h"
 
 ASignboard::ASignboard()
 {
@@ -49,7 +50,13 @@ void ASignboard::Tick(float DeltaTime)
 
 void ASignboard::Interact(APawn* Interactor)
 {
+	// TODO: *MessageText という表記の意味を調べる
 	UE_LOG(LogTemp, Warning, TEXT("看板を読みました！テキスト: %s"), *MessageText.ToString());
+
+	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
+	{
+		PC->ShowDialogue(MessageText);
+	}
 }
 
 void ASignboard::OnInteractAreaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
