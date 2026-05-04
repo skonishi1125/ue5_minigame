@@ -41,11 +41,11 @@ void ABlankPlayerController::ShowDialogue(const FText& Message)
 		DialogueWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 		bIsDialogueOpen = true;
 
-		FInputModeGameAndUI InputMode; // GameAndUI とすることで、Eキーへの入力を受けつつUI操作も可能とさせる
-		InputMode.SetWidgetToFocus(DialogueWidgetInstance->TakeWidget()); // 開いたUIにフォーカス設定をする
-		InputMode.SetHideCursorDuringCapture(false); // クリック時にカーソルを隠さないようにする
-
-		SetInputMode(InputMode);
+		// 仮に看板を呼んでいる途中にマウス操作などを弾きたかったら、下記の通り記載する
+		//FInputModeGameAndUI InputMode; // GameAndUI とすることで、Eキーへの入力を受けつつUI操作も可能とさせる
+		//InputMode.SetWidgetToFocus(DialogueWidgetInstance->TakeWidget()); // 開いたUIにフォーカス設定をする
+		//InputMode.SetHideCursorDuringCapture(false); // クリック時にカーソルを隠さないようにする
+		//SetInputMode(InputMode);
 
 		// ABlankCharacter でなく, 親の ACharacter でキャストする
 		// ファイル先頭で include して ABlankCharacter を読み込む必要が無くなる
@@ -70,8 +70,8 @@ void ABlankPlayerController::CloseDialogue()
 		bIsDialogueOpen = false;
 
 		// 入力モードを戻す
-		FInputModeGameOnly InputMode;
-		SetInputMode(InputMode);
+		//FInputModeGameOnly InputMode;
+		//SetInputMode(InputMode);
 
 		SetIgnoreMoveInput(false);
 	}
