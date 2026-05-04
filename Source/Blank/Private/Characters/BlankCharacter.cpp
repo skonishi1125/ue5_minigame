@@ -227,7 +227,9 @@ void ABlankCharacter::ExecInteractive()
 	// 2. 通常ゲームプレイ時であれば、インタラクト処理
 	FVector Start = GetActorLocation();
 	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
-	FCollisionShape SphereShape = FCollisionShape::MakeSphere(InteractAreaRadius);
+
+	float CurrentRadius = InteractArea->GetScaledSphereRadius();
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(CurrentRadius);
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionParams;

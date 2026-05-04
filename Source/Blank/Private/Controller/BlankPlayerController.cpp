@@ -1,6 +1,8 @@
 ﻿#include "Controller/BlankPlayerController.h"
 #include "Camera/BlankCameraManager.h"
 #include "UIs/BlankDialogueWidget.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ABlankPlayerController::ABlankPlayerController()
 {
@@ -38,6 +40,25 @@ void ABlankPlayerController::ShowDialogue(const FText& Message)
 		DialogueWidgetInstance->SetDialogueText(Message);
 		DialogueWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 		bIsDialogueOpen = true;
+
+		FInputModeGameAndUI InputMode; // GameAndUI とすることで、Eキーへの入力を受けつつUI操作も可能とさせる
+		InputMode.SetWidgetToFocus(DialogueWidgetInstance->TakeWidget()); // 開いたUIにフォーカス設定をする
+		InputMode.SetHideCursorDuringCapture(false); // クリック時にカーソルを隠さないようにする
+
+		SetInputMode(InputMode);
+
+		// ABlankCharacter でなく, 親の ACharacter でキャストする
+		// ファイル先頭で include して ABlankCharacter を読み込む必要が無くなる
+		// 結果、自身のプロジェクト独自クラスを知らなくてもコンパイルが通る
+		// (将来別のキャラクタークラスでダイアログを出したいときもこちらで問題なくなる)
+		if (ACharacter* CastCharacter = Cast<ACharacter>(GetPawn()))
+		{
+			CastCharacter->GetCharacterMovement()->StopMovementImmediately();
+			FlushPressedKeys(); // 押しっぱなし判定などもリフレッシュ
+		}
+
+		SetIgnoreMoveInput(true); // テキスト表示中は移動操作を無効化
+
 	}
 }
 
@@ -47,6 +68,12 @@ void ABlankPlayerController::CloseDialogue()
 	{
 		DialogueWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
 		bIsDialogueOpen = false;
+
+		// 入力モードを戻す
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
+
+		SetIgnoreMoveInput(false);
 	}
 }
 

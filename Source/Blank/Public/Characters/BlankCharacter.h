@@ -95,7 +95,7 @@ private:
 	USphereComponent* InteractArea;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float InteractAreaRadius = 80.f;
+	float InteractAreaRadius = 100.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCoinComponent* CoinComponent;
