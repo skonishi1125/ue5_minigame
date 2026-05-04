@@ -67,6 +67,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void ExecInteractive();
+	void TryJump();
 	//void PossessPlayerController();
 	//void PossessPlayerControllerWithLine();
 private:

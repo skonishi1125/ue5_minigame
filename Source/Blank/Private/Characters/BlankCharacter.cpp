@@ -141,7 +141,8 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 		if (JumpAction)
 		{
-			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+			// この辺りは Super::Jump() などとは書けない（関数ポインタには使えない）。素直に Class::FunctionName の形で書くとよい
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABlankCharacter::TryJump);
 			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		}
 
@@ -263,6 +264,20 @@ void ABlankCharacter::ExecInteractive()
 	}
 
 
+}
+
+void ABlankCharacter::TryJump()
+{
+	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetController()))
+	{
+		if (PC->IsDialogueOpen())
+		{
+			return;
+		}
+	}
+
+	// Super::Jump(), ACharacter::Jump() でもよい
+	Jump();
 }
 
 

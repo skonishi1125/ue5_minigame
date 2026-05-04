@@ -56,6 +56,10 @@ void ASignboard::Interact(APawn* Interactor)
 	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
 	{
 		PC->ShowDialogue(MessageText);
+		if (InteractWidget)
+		{
+			InteractWidget->SetVisibility(false);
+		}
 	}
 }
 
