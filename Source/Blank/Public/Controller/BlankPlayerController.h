@@ -38,6 +38,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UBlankDialogueWidget> DialogueWidgetInstance;
 
+	// TArray自体がデータ配列へのポインタを持っているのでTArray<FText>* として二重管理にしなくても良い
 	UPROPERTY()
 	TArray<FText> CurrentDialogues;
 

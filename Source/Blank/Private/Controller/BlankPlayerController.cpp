@@ -77,12 +77,16 @@ void ABlankPlayerController::ShowDialogue(const TArray<FText>& Messages)
 
 void ABlankPlayerController::ProceedDialogue()
 {
-	// テキストが開いていないとき
-	if (!bIsDialogueOpen)
+	if (!bIsDialogueOpen || !DialogueWidgetInstance) return;
+
+	// 文字がぺぺぺと出ている最中のパターン
+	if (DialogueWidgetInstance->IsTyping())
 	{
+		DialogueWidgetInstance->SkipTyping();
 		return;
 	}
 
+	// 既に全部の文字が表示されているときパターン（次のページ or 閉じる)
 	CurrentDialogueIndex++;
 	if (CurrentDialogues.IsValidIndex(CurrentDialogueIndex))
 	{
