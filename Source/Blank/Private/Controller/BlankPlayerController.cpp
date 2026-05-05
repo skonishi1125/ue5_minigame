@@ -28,16 +28,29 @@ void ABlankPlayerController::BeginPlay()
 			DialogueWidgetInstance->AddToViewport();
 			DialogueWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
 		}
+
+		CurrentDialogueIndex = 0;
 	}
 
 }
 
 
-void ABlankPlayerController::ShowDialogue(const FText& Message)
+void ABlankPlayerController::ShowDialogue(const TArray<FText>& Messages)
 {
 	if (DialogueWidgetInstance && !bIsDialogueOpen)
 	{
-		DialogueWidgetInstance->SetDialogueText(Message);
+		// Messages.Num() > 0 でもよいので、空配列かどうかをチェックすることを忘れない
+		if (Messages.IsEmpty())
+		{
+			UE_LOG(LogTemp, Error, TEXT("ABlankPlayerController::ShowDialogue(): メッセージ配列が空です。"));
+			return;
+		}
+
+		// 渡されたダイアログ配列をControllerで保管
+		CurrentDialogues = Messages;
+		CurrentDialogueIndex = 0;
+
+		DialogueWidgetInstance->SetDialogueText(Messages[CurrentDialogueIndex]);
 		DialogueWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 		bIsDialogueOpen = true;
 
@@ -62,17 +75,37 @@ void ABlankPlayerController::ShowDialogue(const FText& Message)
 	}
 }
 
+void ABlankPlayerController::ProceedDialogue()
+{
+	// テキストが開いていないとき
+	if (!bIsDialogueOpen)
+	{
+		return;
+	}
+
+	CurrentDialogueIndex++;
+	if (CurrentDialogues.IsValidIndex(CurrentDialogueIndex))
+	{
+		DialogueWidgetInstance->SetDialogueText(CurrentDialogues[CurrentDialogueIndex]);
+	}
+	else
+	{
+		CloseDialogue();
+	}
+
+}
+
 void ABlankPlayerController::CloseDialogue()
 {
 	if (DialogueWidgetInstance && bIsDialogueOpen)
 	{
-		DialogueWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
-		bIsDialogueOpen = false;
-
 		// 入力モードを戻す
 		//FInputModeGameOnly InputMode;
 		//SetInputMode(InputMode);
 
+		DialogueWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+		bIsDialogueOpen = false;
+		CurrentDialogues.Empty();
 		SetIgnoreMoveInput(false);
 	}
 }

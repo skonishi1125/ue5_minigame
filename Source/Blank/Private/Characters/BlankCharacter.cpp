@@ -220,8 +220,8 @@ void ABlankCharacter::ExecInteractive()
 	{
 		if (PC->IsDialogueOpen())
 		{
-			PC->CloseDialogue();
-			return;
+			PC->ProceedDialogue();
+			return; // 無いと、ダイアログを閉じつつインタラクトが発生してループしてしまう
 		}
 	}
 

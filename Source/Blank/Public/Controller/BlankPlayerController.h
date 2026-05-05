@@ -17,7 +17,8 @@ public:
 	void ReturnToOriginalPawn();
 
 	// ======== ダイアログUI関連 ========
-	void ShowDialogue(const FText& Message);
+	void ShowDialogue(const TArray<FText>& Messages);
+	void ProceedDialogue();
 	void CloseDialogue();
 	bool IsDialogueOpen() const { return bIsDialogueOpen; }
 protected:
@@ -37,6 +38,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<UBlankDialogueWidget> DialogueWidgetInstance;
 
+	UPROPERTY()
+	TArray<FText> CurrentDialogues;
+
+	int32 CurrentDialogueIndex = 0;
 	bool bIsDialogueOpen = false;
 
 

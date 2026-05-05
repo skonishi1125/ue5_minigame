@@ -21,7 +21,9 @@ ASignboard::ASignboard()
 	InteractArea->SetSphereRadius(60.f);
 	InteractArea->SetupAttachment(RootScene);
 
-	MessageText = INVTEXT("看板のテキストをここに入力");
+	MessageTexts.Add(INVTEXT("1ページ目のテキストです。"));
+	MessageTexts.Add(INVTEXT("2ページ目。"));
+	MessageTexts.Add(INVTEXT("3ページ目。終わり。"));
 	// MessageText = FText::FromString("Sample Text"); でもよい
 
 	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
@@ -50,12 +52,12 @@ void ASignboard::Tick(float DeltaTime)
 
 void ASignboard::Interact(APawn* Interactor)
 {
-	// TODO: *MessageText という表記の意味を調べる
-	UE_LOG(LogTemp, Warning, TEXT("看板を読みました！テキスト: %s"), *MessageText.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("看板を読みました！テキスト: %s"), *MessageText.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("ASignboard::Interact()"));
 
 	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
 	{
-		PC->ShowDialogue(MessageText);
+		PC->ShowDialogue(MessageTexts);
 		if (InteractWidget)
 		{
 			InteractWidget->SetVisibility(false);

@@ -36,7 +36,7 @@ private:
 	TObjectPtr<USphereComponent> InteractArea;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FText MessageText;
+	TArray<FText> MessageTexts;
 
 	// allowprivateaccess 無しでもエラーは出ない
 	// C++のコンパイラがポインタの宣言自体は許容する, 現在UE側でエラーは出ないという仕様
