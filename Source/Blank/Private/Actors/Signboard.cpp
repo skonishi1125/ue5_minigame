@@ -21,10 +21,7 @@ ASignboard::ASignboard()
 	InteractArea->SetSphereRadius(60.f);
 	InteractArea->SetupAttachment(RootScene);
 
-	MessageTexts.Add(INVTEXT("1ページ目のテキストです。1ページ目のテキストです。1ページ目のテキストです。1ページ目のテキストです。1ページ目のテキストです。1ページ目のテキストです。1ページ目のテキストです。"));
-	MessageTexts.Add(INVTEXT("2ページ目。本日は晴天なり。ああいったありがとうございました。eスポーツウィジェットエネルギーエンジニアリング。"));
-	MessageTexts.Add(INVTEXT("3ページ目。終わり。アリーナ型上野エキスパートありがとうございました。"));
-	// MessageText = FText::FromString("Sample Text"); でもよい
+	MessageTexts.Add(INVTEXT("1ページ目のテキストです。\n改行は Shift + Enter でできます。\n1ページ目のテキスト。1ページ目のテキスト。"));
 
 	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
 	InteractWidget->SetupAttachment(GetRootComponent());
