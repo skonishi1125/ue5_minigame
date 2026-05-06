@@ -6,6 +6,7 @@
 
 class APawn;
 class UBlankDialogueWidget;
+class UInputMappingContext;
 
 UCLASS()
 class BLANK_API ABlankPlayerController : public APlayerController
@@ -23,6 +24,9 @@ public:
 	bool IsDialogueOpen() const { return bIsDialogueOpen; }
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputMappingContext> DialogueMappingContext;
 private:
 
 	// APawn* OriginalPawn でも同じだが、

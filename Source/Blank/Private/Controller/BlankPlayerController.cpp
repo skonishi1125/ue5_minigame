@@ -3,6 +3,7 @@
 #include "UIs/BlankDialogueWidget.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 ABlankPlayerController::ABlankPlayerController()
 {
@@ -69,8 +70,17 @@ void ABlankPlayerController::ShowDialogue(const TArray<FText>& Messages)
 			CastCharacter->GetCharacterMovement()->StopMovementImmediately();
 			FlushPressedKeys(); // 押しっぱなし判定などもリフレッシュ
 		}
-
 		SetIgnoreMoveInput(true); // テキスト表示中は移動操作を無効化
+
+		// ダイアログ用のマッピング調整
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+		{
+			if (DialogueMappingContext)
+			{
+				Subsystem->AddMappingContext(DialogueMappingContext, 10);
+			}
+		}
+
 
 	}
 }
@@ -111,6 +121,15 @@ void ABlankPlayerController::CloseDialogue()
 		bIsDialogueOpen = false;
 		CurrentDialogues.Empty();
 		SetIgnoreMoveInput(false);
+
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+		{
+			if (DialogueMappingContext)
+			{
+				Subsystem->RemoveMappingContext(DialogueMappingContext);
+			}
+		}
+
 	}
 }
 

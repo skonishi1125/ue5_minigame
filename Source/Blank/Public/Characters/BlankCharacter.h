@@ -63,11 +63,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* InteractAction;
 
+	// UInputAction* よりも TObjectPtr のほうが好ましいので、一旦こうする（比較用に並べておく）
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> ProceedDialogueAction;
+
 	// ========= アクション関連 ===========
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void ExecInteractive();
 	void TryJump();
+	void RequestProceedDialogue();
 	//void PossessPlayerController();
 	//void PossessPlayerControllerWithLine();
 private:

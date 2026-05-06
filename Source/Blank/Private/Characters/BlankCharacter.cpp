@@ -150,8 +150,13 @@ void ABlankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		{
 			//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABlankCharacter::PossessPlayerController);
 			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ABlankCharacter::ExecInteractive);
-
 		}
+
+		if (ProceedDialogueAction)
+		{
+			EnhancedInputComponent->BindAction(ProceedDialogueAction, ETriggerEvent::Started, this, &ABlankCharacter::RequestProceedDialogue);
+		}
+
 
 	}
 
@@ -215,17 +220,6 @@ void ABlankCharacter::ExecInteractive()
 {
 	UE_LOG(LogTemp, Warning, TEXT("BlankCharacter::ExecInteractive"));
 
-	// 1. テキストウィンドウUI が開いている状態であれば、閉じるという処理を行う
-	if (ABlankPlayerController* PC = Cast <ABlankPlayerController>(GetController()))
-	{
-		if (PC->IsDialogueOpen())
-		{
-			PC->ProceedDialogue();
-			return; // 無いと、ダイアログを閉じつつインタラクトが発生してループしてしまう
-		}
-	}
-
-	// 2. 通常ゲームプレイ時であれば、インタラクト処理
 	FVector Start = GetActorLocation();
 	FVector End = Start + (GetActorForwardVector() * 10.f); // 始点と終点を中心から少しだけずらす
 
@@ -278,6 +272,14 @@ void ABlankCharacter::TryJump()
 
 	// Super::Jump(), ACharacter::Jump() でもよい
 	Jump();
+}
+
+void ABlankCharacter::RequestProceedDialogue()
+{
+	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetController()))
+	{
+		PC->ProceedDialogue();
+	}
 }
 
 
