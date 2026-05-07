@@ -74,6 +74,8 @@ void ASignboard::Interact(APawn* Interactor)
 							TargetActorToDestroy->Destroy();
 							TargetActorToDestroy = nullptr;
 						}
+
+						CoinComp->UseCoin(5);
 					}
 				}
 			}
