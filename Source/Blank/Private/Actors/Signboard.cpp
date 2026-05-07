@@ -5,6 +5,7 @@
 #include "Components/WidgetComponent.h"
 #include "Characters/BlankCharacter.h"
 #include "Controller/BlankPlayerController.h"
+#include "Components/CoinComponent.h"
 
 ASignboard::ASignboard()
 {
@@ -52,13 +53,39 @@ void ASignboard::Interact(APawn* Interactor)
 	//UE_LOG(LogTemp, Warning, TEXT("看板を読みました！テキスト: %s"), *MessageText.ToString());
 	UE_LOG(LogTemp, Warning, TEXT("ASignboard::Interact()"));
 
+
 	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
 	{
-		PC->ShowDialogue(MessageTexts);
+
+		TArray<FText> SelectedTexts = MessageTexts;
+
+		for (const FConditionalDialogue& Item : ConditionalDialogues)
+		{
+			// コイン取得処理
+			if (Item.ConditionTag == "FiveCoins")
+			{
+				if (UCoinComponent* CoinComp = Interactor->FindComponentByClass<UCoinComponent>())
+				{
+					if (CoinComp->GetCoinCount() >= 5)
+					{
+						SelectedTexts = Item.DialogueTexts;
+						if (TargetActorToDestroy)
+						{
+							TargetActorToDestroy->Destroy();
+							TargetActorToDestroy = nullptr;
+						}
+					}
+				}
+			}
+		}
+
+		PC->ShowDialogue(SelectedTexts);
+
 		if (InteractWidget)
 		{
 			InteractWidget->SetVisibility(false);
 		}
+
 	}
 }
 
