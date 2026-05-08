@@ -24,6 +24,7 @@ class USphereComponent;
 
 // 自作Componentなど
 class UCoinComponent;
+class UCharacterStatComponent;
 
 UCLASS()
 class BLANK_API ABlankCharacter : public ACharacter
@@ -105,5 +106,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCoinComponent* CoinComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UCharacterStatComponent* StatComponent;
 
 };

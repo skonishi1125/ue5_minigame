@@ -11,18 +11,12 @@ class UStaticMeshComponent;
 class USphereComponent;
 class UWidgetComponent;
 
-USTRUCT(BlueprintType)
-struct FConditionalDialogue
+UENUM(BlueprintType)
+enum class ESignboardState : uint8
 {
-	GENERATED_BODY()
-
-	// 条件を判定するためのタグ "HasEnoughCoins", "OpenedSecretGate
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Condition")
-	FName ConditionTag;
-
-	// 条件を満たしたときに表示するテキスト
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue", meta = (MultiLine = "true"))
-	TArray<FText> DialogueTexts;
+	Initial,
+	WaitingForCoins,
+	Completed
 };
 
 UCLASS()
@@ -34,9 +28,6 @@ public:
 	ASignboard();
 	virtual void Tick(float DeltaTime) override;
 	virtual void Interact(APawn* Interactor) override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", MultiLine = "true"))
-	TArray<FConditionalDialogue> ConditionalDialogues;
 
 	UPROPERTY(EditInstanceOnly, Category = "Event")
 	TObjectPtr<AActor> TargetActorToDestroy;
@@ -55,9 +46,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USphereComponent> InteractArea;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", MultiLine = "true"))
-	TArray<FText> MessageTexts;
-
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", MultiLine = "true"))
 	//TArray<FConditionalDialogue> ConditionalDialogues;
 
@@ -72,6 +60,27 @@ private:
 
 	UFUNCTION()
 	void OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	ESignboardState CurrentState = ESignboardState::Initial;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	TArray<FText> InitialTexts;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	TArray<FText> NotEnoughCoinsTexts;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	TArray<FText> SuccessTexts;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	TArray<FText> CompleteTexts;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	bool bHasMultipleText = false; // InitialTexts 以外を持つ場合
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	int32 RequiredCoinNumber = 0;
 
 
 };

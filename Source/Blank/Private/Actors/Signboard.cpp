@@ -6,6 +6,7 @@
 #include "Characters/BlankCharacter.h"
 #include "Controller/BlankPlayerController.h"
 #include "Components/CoinComponent.h"
+#include "Components/CharacterStatComponent.h"
 
 ASignboard::ASignboard()
 {
@@ -22,7 +23,7 @@ ASignboard::ASignboard()
 	InteractArea->SetSphereRadius(60.f);
 	InteractArea->SetupAttachment(RootScene);
 
-	MessageTexts.Add(INVTEXT("1ページ目のテキストです。\n改行は Shift + Enter でできます。\n1ページ目のテキスト。1ページ目のテキスト。"));
+	InitialTexts.Add(INVTEXT("1ページ目のテキストです。\n改行は Shift + Enter でできます。\n1ページ目のテキスト。1ページ目のテキスト。"));
 
 	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
 	InteractWidget->SetupAttachment(GetRootComponent());
@@ -57,32 +58,57 @@ void ASignboard::Interact(APawn* Interactor)
 	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
 	{
 
-		TArray<FText> SelectedTexts = MessageTexts;
+		TArray<FText> SelectedTexts = InitialTexts;
 
-		for (const FConditionalDialogue& Item : ConditionalDialogues)
+		if (bHasMultipleText)
 		{
-			// コイン取得処理
-			if (Item.ConditionTag == "FiveCoins")
+			switch (CurrentState)
 			{
+			case ESignboardState::Initial:
+				SelectedTexts = InitialTexts;
+				CurrentState = ESignboardState::WaitingForCoins;
+				break;
+
+			case ESignboardState::WaitingForCoins:
 				if (UCoinComponent* CoinComp = Interactor->FindComponentByClass<UCoinComponent>())
 				{
-					if (CoinComp->GetCoinCount() >= 5)
+					if (CoinComp->GetCoinCount() >= RequiredCoinNumber)
 					{
-						SelectedTexts = Item.DialogueTexts;
+						SelectedTexts = SuccessTexts;
+
+						// 妨害している Actor があるなら消す
 						if (TargetActorToDestroy)
 						{
 							TargetActorToDestroy->Destroy();
 							TargetActorToDestroy = nullptr;
 						}
+						CoinComp->UseCoin(RequiredCoinNumber);
+						CurrentState = ESignboardState::Completed;
 
-						CoinComp->UseCoin(5);
+						if (UCharacterStatComponent* StatComp = Interactor->FindComponentByClass<UCharacterStatComponent>())
+						{
+							UE_LOG(LogTemp, Warning, TEXT("ジャンプ力アップ"));
+							StatComp->AddJumpMultiplier(3.0f);
+						}
+
+					}
+					else
+					{
+						SelectedTexts = NotEnoughCoinsTexts;
 					}
 				}
+				break;
+			case ESignboardState::Completed:
+				SelectedTexts = CompleteTexts;
+				break;
 			}
+		}
+		else
+		{
+			SelectedTexts = InitialTexts;
 		}
 
 		PC->ShowDialogue(SelectedTexts);
-
 		if (InteractWidget)
 		{
 			InteractWidget->SetVisibility(false);

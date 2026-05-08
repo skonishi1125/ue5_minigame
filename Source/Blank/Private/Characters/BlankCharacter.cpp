@@ -21,6 +21,7 @@
 #include "Controller/BlankPlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "Interface/Interactable.h"
+#include "Components/CharacterStatComponent.h"
 
 ABlankCharacter::ABlankCharacter()
 {
@@ -80,6 +81,7 @@ ABlankCharacter::ABlankCharacter()
 
 	// Component 関連
 	CoinComponent = CreateDefaultSubobject<UCoinComponent>(TEXT("CoinComponent"));
+	StatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("StatComponent"));
 
 }
 
