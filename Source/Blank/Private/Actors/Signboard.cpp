@@ -77,20 +77,23 @@ void ASignboard::Interact(APawn* Interactor)
 						SelectedTexts = SuccessTexts;
 
 						// 妨害している Actor があるなら消す
-						if (TargetActorToDestroy)
+						if (bIsActorDestroy && TargetActorToDestroy)
 						{
 							TargetActorToDestroy->Destroy();
 							TargetActorToDestroy = nullptr;
 						}
-						CoinComp->UseCoin(RequiredCoinNumber);
-						CurrentState = ESignboardState::Completed;
 
-						if (UCharacterStatComponent* StatComp = Interactor->FindComponentByClass<UCharacterStatComponent>())
+						if (bIsJumpUp)
 						{
-							UE_LOG(LogTemp, Warning, TEXT("ジャンプ力アップ"));
-							StatComp->AddJumpMultiplier(3.0f);
+							if (UCharacterStatComponent* StatComp = Interactor->FindComponentByClass<UCharacterStatComponent>())
+							{
+								UE_LOG(LogTemp, Warning, TEXT("ジャンプ力アップ"));
+								StatComp->AddJumpMultiplier(3.0f);
+							}
 						}
 
+						CoinComp->UseCoin(RequiredCoinNumber);
+						CurrentState = ESignboardState::Completed;
 					}
 					else
 					{

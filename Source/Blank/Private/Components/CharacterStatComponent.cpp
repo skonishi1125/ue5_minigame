@@ -17,6 +17,8 @@ void UCharacterStatComponent::UpdateMovementComponent()
 		if (UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement())
 		{
 			Movement->JumpZVelocity = BaseJumpZVelocity * CurrentJumpMultiplier;
+			Movement->AirControl = 1.0f;
+			Movement->MaxWalkSpeed = 1200.f;
 		}
 	}
 }
