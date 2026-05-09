@@ -90,10 +90,6 @@ void ASignboard::Interact(APawn* Interactor)
 								UE_LOG(LogTemp, Warning, TEXT("ジャンプ力アップ"));
 								StatComp->AddJumpMultiplier(3.0f);
 							}
-
-							// =========== クリア処理テスト用...===========
-							//PC->OnGameCleared();
-
 						}
 
 						CoinComp->UseCoin(RequiredCoinNumber);
@@ -115,7 +111,7 @@ void ASignboard::Interact(APawn* Interactor)
 			SelectedTexts = InitialTexts;
 		}
 
-		PC->ShowDialogue(SelectedTexts);
+		PC->ShowDialogue(SelectedTexts, FOnDialogueClosedSignature::CreateUObject(this, &ASignboard::OnDialogueFinished));
 		if (InteractWidget)
 		{
 			InteractWidget->SetVisibility(false);
@@ -149,6 +145,18 @@ void ASignboard::OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedCompone
 			{
 				InteractWidget->SetVisibility(false);
 			}
+		}
+	}
+}
+
+void ASignboard::OnDialogueFinished()
+{
+	// クリアフラグが立っていれば、Controllerの OnGameCleared() を実行
+	if (bIsClear && CurrentState == ESignboardState::Completed)
+	{
+		if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetWorld()->GetFirstPlayerController()))
+		{
+			PC->OnGameCleared();
 		}
 	}
 }

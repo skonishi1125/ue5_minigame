@@ -4,6 +4,8 @@
 #include "GameFramework/PlayerController.h"
 #include "BlankPlayerController.generated.h"
 
+DECLARE_DELEGATE(FOnDialogueClosedSignature);
+
 class APawn;
 class UBlankDialogueWidget;
 class UInputMappingContext;
@@ -19,7 +21,7 @@ public:
 	void ReturnToOriginalPawn();
 
 	// ======== ダイアログUI関連 ========
-	void ShowDialogue(const TArray<FText>& Messages);
+	void ShowDialogue(const TArray<FText>& Messages, FOnDialogueClosedSignature OnClosedCallback = FOnDialogueClosedSignature());
 	void ProceedDialogue();
 	void CloseDialogue();
 	bool IsDialogueOpen() const { return bIsDialogueOpen; }
@@ -38,6 +40,9 @@ protected:
 	TSubclassOf<UGameClearWidget> GameClearWidgetClass;
 
 private:
+
+	// 登録された Callback 関数を保持する変数
+	FOnDialogueClosedSignature OnDialogueClosedCallback;
 
 	// APawn* OriginalPawn でも同じだが、
 	// UE5 におけるクラスメンバ変数は TObjectPtr を作るこちらが好ましい

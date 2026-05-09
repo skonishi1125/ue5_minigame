@@ -92,4 +92,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
 	bool bIsClear = false;
 
+	void OnDialogueFinished();
+
 };
