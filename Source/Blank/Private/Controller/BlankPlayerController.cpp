@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "UIs/GameClearWidget.h"
 
 ABlankPlayerController::ABlankPlayerController()
 {
@@ -12,6 +13,7 @@ ABlankPlayerController::ABlankPlayerController()
 	// ABlankCameramanagerでは、カメラの比率などを持たせてゲーム共通のルールとしている
 	PlayerCameraManagerClass = ABlankCameraManager::StaticClass();
 }
+
 
 void ABlankPlayerController::BeginPlay()
 {
@@ -36,7 +38,7 @@ void ABlankPlayerController::BeginPlay()
 }
 
 
-void ABlankPlayerController::ShowDialogue(const TArray<FText>& Messages)
+void ABlankPlayerController::ShowDialogue(const TArray<FText>& Messages, FOnDialogueClosedSignature OnClosedCallback)
 {
 	if (DialogueWidgetInstance && !bIsDialogueOpen)
 	{
@@ -80,6 +82,9 @@ void ABlankPlayerController::ShowDialogue(const TArray<FText>& Messages)
 				Subsystem->AddMappingContext(DialogueMappingContext, 10);
 			}
 		}
+
+		// コールバックが渡されたら、そちらを保持しておく
+		OnDialogueClosedCallback = OnClosedCallback;
 
 
 	}
@@ -130,6 +135,9 @@ void ABlankPlayerController::CloseDialogue()
 			}
 		}
 
+		// ダイアログを閉じた時、ShowDialogue()で渡されたコールバック関数の実行 / 解除
+		OnDialogueClosedCallback.ExecuteIfBound();
+		OnDialogueClosedCallback.Unbind();
 	}
 }
 
@@ -151,5 +159,19 @@ void ABlankPlayerController::ReturnToOriginalPawn()
 	{
 		Possess(OriginalPawn);
 		OriginalPawn = nullptr;
+	}
+}
+
+void ABlankPlayerController::OnGameCleared()
+{
+	if (GameClearWidgetClass && !GameClearWidgetInstance)
+	{
+		GameClearWidgetInstance = CreateWidget<UGameClearWidget>(this, GameClearWidgetClass);
+		if (GameClearWidgetInstance)
+		{
+			// 画面に追加し、アニメ再生
+			GameClearWidgetInstance->AddToViewport();
+			GameClearWidgetInstance->PlayFadeInAnimation();
+		}
 	}
 }

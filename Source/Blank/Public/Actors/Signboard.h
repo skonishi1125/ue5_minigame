@@ -11,6 +11,14 @@ class UStaticMeshComponent;
 class USphereComponent;
 class UWidgetComponent;
 
+UENUM(BlueprintType)
+enum class ESignboardState : uint8
+{
+	Initial,
+	WaitingForCoins,
+	Completed
+};
+
 UCLASS()
 class BLANK_API ASignboard : public AActor, public IInteractable
 {
@@ -20,6 +28,9 @@ public:
 	ASignboard();
 	virtual void Tick(float DeltaTime) override;
 	virtual void Interact(APawn* Interactor) override;
+
+	UPROPERTY(EditInstanceOnly, Category = "Event")
+	TObjectPtr<AActor> TargetActorToDestroy;
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,8 +46,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USphereComponent> InteractArea;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", MultiLine = "true"))
-	TArray<FText> MessageTexts;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", MultiLine = "true"))
+	//TArray<FConditionalDialogue> ConditionalDialogues;
 
 	// allowprivateaccess 無しでもエラーは出ない
 	// C++のコンパイラがポインタの宣言自体は許容する, 現在UE側でエラーは出ないという仕様
@@ -50,5 +61,37 @@ private:
 	UFUNCTION()
 	void OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	ESignboardState CurrentState = ESignboardState::Initial;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	TArray<FText> InitialTexts;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	TArray<FText> NotEnoughCoinsTexts;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	TArray<FText> SuccessTexts;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	TArray<FText> CompleteTexts;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	bool bHasMultipleText = false; // InitialTexts 以外を持つ場合
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	int32 RequiredCoinNumber = 0;
+
+	// Actor 破壊タイプか、ジャンプアップタイプか, クリア判定か
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	bool bIsActorDestroy = false;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	bool bIsJumpUp = false;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	bool bIsClear = false;
+
+	void OnDialogueFinished();
 
 };

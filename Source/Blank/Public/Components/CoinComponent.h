@@ -22,6 +22,9 @@ public:
 	void AddCoin();
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
+	void UseCoin(int32 number);
+
+	UFUNCTION(BlueprintCallable, Category = "Stats")
 	int32 GetCoinCount() const;
 
 	// マクロで定義したクラスを使用し、

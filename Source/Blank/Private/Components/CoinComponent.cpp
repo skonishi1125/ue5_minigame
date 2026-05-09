@@ -29,6 +29,19 @@ void UCoinComponent::AddCoin()
 	OnCoinCountChanged.Broadcast(CoinCount);
 }
 
+void UCoinComponent::UseCoin(int32 number)
+{
+	CoinCount -= number;
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("UCoinComponent, Coin Count: %d"), CoinCount));
+	}
+	OnCoinCountChanged.Broadcast(CoinCount);
+
+}
+
+
+
 int32 UCoinComponent::GetCoinCount() const
 {
 	return CoinCount;

@@ -4,9 +4,12 @@
 #include "GameFramework/PlayerController.h"
 #include "BlankPlayerController.generated.h"
 
+DECLARE_DELEGATE(FOnDialogueClosedSignature);
+
 class APawn;
 class UBlankDialogueWidget;
 class UInputMappingContext;
+class UGameClearWidget;
 
 UCLASS()
 class BLANK_API ABlankPlayerController : public APlayerController
@@ -18,16 +21,28 @@ public:
 	void ReturnToOriginalPawn();
 
 	// ======== ダイアログUI関連 ========
-	void ShowDialogue(const TArray<FText>& Messages);
+	void ShowDialogue(const TArray<FText>& Messages, FOnDialogueClosedSignature OnClosedCallback = FOnDialogueClosedSignature());
 	void ProceedDialogue();
 	void CloseDialogue();
 	bool IsDialogueOpen() const { return bIsDialogueOpen; }
+
+	// クリア処理
+	void OnGameCleared();
+
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> DialogueMappingContext;
+
+	// クリア画面ウィジェット エディタ割り当て用
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UGameClearWidget> GameClearWidgetClass;
+
 private:
+
+	// 登録された Callback 関数を保持する変数
+	FOnDialogueClosedSignature OnDialogueClosedCallback;
 
 	// APawn* OriginalPawn でも同じだが、
 	// UE5 におけるクラスメンバ変数は TObjectPtr を作るこちらが好ましい
@@ -49,5 +64,8 @@ private:
 	int32 CurrentDialogueIndex = 0;
 	bool bIsDialogueOpen = false;
 
+	// クリア用ウィジェット 生成したインスタンス保持用
+	UPROPERTY()
+	TObjectPtr<UGameClearWidget> GameClearWidgetInstance;
 
 };

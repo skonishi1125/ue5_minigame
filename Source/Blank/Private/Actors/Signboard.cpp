@@ -5,6 +5,8 @@
 #include "Components/WidgetComponent.h"
 #include "Characters/BlankCharacter.h"
 #include "Controller/BlankPlayerController.h"
+#include "Components/CoinComponent.h"
+#include "Components/CharacterStatComponent.h"
 
 ASignboard::ASignboard()
 {
@@ -21,7 +23,7 @@ ASignboard::ASignboard()
 	InteractArea->SetSphereRadius(60.f);
 	InteractArea->SetupAttachment(RootScene);
 
-	MessageTexts.Add(INVTEXT("1ページ目のテキストです。\n改行は Shift + Enter でできます。\n1ページ目のテキスト。1ページ目のテキスト。"));
+	InitialTexts.Add(INVTEXT("1ページ目のテキストです。\n改行は Shift + Enter でできます。\n1ページ目のテキスト。1ページ目のテキスト。"));
 
 	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
 	InteractWidget->SetupAttachment(GetRootComponent());
@@ -52,13 +54,69 @@ void ASignboard::Interact(APawn* Interactor)
 	//UE_LOG(LogTemp, Warning, TEXT("看板を読みました！テキスト: %s"), *MessageText.ToString());
 	UE_LOG(LogTemp, Warning, TEXT("ASignboard::Interact()"));
 
+
 	if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(Interactor->GetController()))
 	{
-		PC->ShowDialogue(MessageTexts);
+
+		TArray<FText> SelectedTexts = InitialTexts;
+
+		if (bHasMultipleText)
+		{
+			switch (CurrentState)
+			{
+			case ESignboardState::Initial:
+				SelectedTexts = InitialTexts;
+				CurrentState = ESignboardState::WaitingForCoins;
+				break;
+
+			case ESignboardState::WaitingForCoins:
+				if (UCoinComponent* CoinComp = Interactor->FindComponentByClass<UCoinComponent>())
+				{
+					if (CoinComp->GetCoinCount() >= RequiredCoinNumber)
+					{
+						SelectedTexts = SuccessTexts;
+
+						// 妨害している Actor があるなら消す
+						if (bIsActorDestroy && TargetActorToDestroy)
+						{
+							TargetActorToDestroy->Destroy();
+							TargetActorToDestroy = nullptr;
+						}
+
+						if (bIsJumpUp)
+						{
+							if (UCharacterStatComponent* StatComp = Interactor->FindComponentByClass<UCharacterStatComponent>())
+							{
+								UE_LOG(LogTemp, Warning, TEXT("ジャンプ力アップ"));
+								StatComp->AddJumpMultiplier(3.0f);
+							}
+						}
+
+						CoinComp->UseCoin(RequiredCoinNumber);
+						CurrentState = ESignboardState::Completed;
+					}
+					else
+					{
+						SelectedTexts = NotEnoughCoinsTexts;
+					}
+				}
+				break;
+			case ESignboardState::Completed:
+				SelectedTexts = CompleteTexts;
+				break;
+			}
+		}
+		else
+		{
+			SelectedTexts = InitialTexts;
+		}
+
+		PC->ShowDialogue(SelectedTexts, FOnDialogueClosedSignature::CreateUObject(this, &ASignboard::OnDialogueFinished));
 		if (InteractWidget)
 		{
 			InteractWidget->SetVisibility(false);
 		}
+
 	}
 }
 
@@ -87,6 +145,18 @@ void ASignboard::OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedCompone
 			{
 				InteractWidget->SetVisibility(false);
 			}
+		}
+	}
+}
+
+void ASignboard::OnDialogueFinished()
+{
+	// クリアフラグが立っていれば、Controllerの OnGameCleared() を実行
+	if (bIsClear && CurrentState == ESignboardState::Completed)
+	{
+		if (ABlankPlayerController* PC = Cast<ABlankPlayerController>(GetWorld()->GetFirstPlayerController()))
+		{
+			PC->OnGameCleared();
 		}
 	}
 }
