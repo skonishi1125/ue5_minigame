@@ -92,7 +92,7 @@ void ASignboard::Interact(APawn* Interactor)
 							}
 
 							// =========== クリア処理テスト用...===========
-							PC->OnGameCleared();
+							//PC->OnGameCleared();
 
 						}
 

@@ -82,11 +82,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
 	int32 RequiredCoinNumber = 0;
 
-	// Actor 破壊タイプか、ジャンプアップタイプか
+	// Actor 破壊タイプか、ジャンプアップタイプか, クリア判定か
 	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
 	bool bIsActorDestroy = false;
 
 	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
 	bool bIsJumpUp = false;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue", meta = (MultiLine = "true"))
+	bool bIsClear = false;
 
 };
