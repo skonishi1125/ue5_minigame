@@ -16,5 +16,10 @@ void UTitleWidget::NativeConstruct()
 
 void UTitleWidget::OnStartButtonClicked()
 {
-	UGameplayStatics::OpenLevel(this, NextLevelName);
+	if (!NextLevel.IsNull())
+	{
+		// ソフト参照を使ってレベルを開く
+		// Packaging したとき、Cookerがアセットを検知できる）
+		UGameplayStatics::OpenLevelBySoftObjectPtr(this, NextLevel);
+	}
 }

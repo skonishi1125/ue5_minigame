@@ -22,7 +22,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UButton* StartButton;
 
-	UPROPERTY(EditAnywhere, Category = "LevelTransition")
-	FName NextLevelName = FName("WorldMap");
+	UPROPERTY(EditAnywhere, Category = "LevelTransition", meta = (AllowedClasses = "World"))
+	TSoftObjectPtr<UWorld> NextLevel;
 
 };
