@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "UIs/GameClearWidget.h"
 
 ABlankPlayerController::ABlankPlayerController()
 {
@@ -12,6 +13,7 @@ ABlankPlayerController::ABlankPlayerController()
 	// ABlankCameramanagerでは、カメラの比率などを持たせてゲーム共通のルールとしている
 	PlayerCameraManagerClass = ABlankCameraManager::StaticClass();
 }
+
 
 void ABlankPlayerController::BeginPlay()
 {
@@ -151,5 +153,19 @@ void ABlankPlayerController::ReturnToOriginalPawn()
 	{
 		Possess(OriginalPawn);
 		OriginalPawn = nullptr;
+	}
+}
+
+void ABlankPlayerController::OnGameCleared()
+{
+	if (GameClearWidgetClass && !GameClearWidgetInstance)
+	{
+		GameClearWidgetInstance = CreateWidget<UGameClearWidget>(this, GameClearWidgetClass);
+		if (GameClearWidgetInstance)
+		{
+			// 画面に追加し、アニメ再生
+			GameClearWidgetInstance->AddToViewport();
+			GameClearWidgetInstance->PlayFadeInAnimation();
+		}
 	}
 }

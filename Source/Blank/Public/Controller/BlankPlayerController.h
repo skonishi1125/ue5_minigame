@@ -7,6 +7,7 @@
 class APawn;
 class UBlankDialogueWidget;
 class UInputMappingContext;
+class UGameClearWidget;
 
 UCLASS()
 class BLANK_API ABlankPlayerController : public APlayerController
@@ -22,11 +23,20 @@ public:
 	void ProceedDialogue();
 	void CloseDialogue();
 	bool IsDialogueOpen() const { return bIsDialogueOpen; }
+
+	// クリア処理
+	void OnGameCleared();
+
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> DialogueMappingContext;
+
+	// クリア画面ウィジェット エディタ割り当て用
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UGameClearWidget> GameClearWidgetClass;
+
 private:
 
 	// APawn* OriginalPawn でも同じだが、
@@ -49,5 +59,8 @@ private:
 	int32 CurrentDialogueIndex = 0;
 	bool bIsDialogueOpen = false;
 
+	// クリア用ウィジェット 生成したインスタンス保持用
+	UPROPERTY()
+	TObjectPtr<UGameClearWidget> GameClearWidgetInstance;
 
 };

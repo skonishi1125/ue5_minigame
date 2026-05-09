@@ -90,6 +90,10 @@ void ASignboard::Interact(APawn* Interactor)
 								UE_LOG(LogTemp, Warning, TEXT("ジャンプ力アップ"));
 								StatComp->AddJumpMultiplier(3.0f);
 							}
+
+							// =========== クリア処理テスト用...===========
+							PC->OnGameCleared();
+
 						}
 
 						CoinComp->UseCoin(RequiredCoinNumber);
